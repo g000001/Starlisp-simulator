@@ -198,7 +198,7 @@
 
 (defvar *first-*cold-boot* nil)
 
-(defconstant *lisp-interpreter-p* nil "This is not the *Lisp interpreter")
-(defconstant *lisp-simulator-p* t "This is the *Lisp simulator")
+(defconstant +lisp-interpreter-p+ nil "This is not the *Lisp interpreter")
+(defconstant +lisp-simulator-p+ t "This is the *Lisp simulator")
 
 

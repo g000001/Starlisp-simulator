@@ -21,11 +21,11 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   
-  (*lisp::deftype max-cube-address-pvar-type () `(pvar (unsigned-byte #.*max-cube-address-length*)))
-  (*lisp::deftype max-grid-address-pvar-type () `(pvar (signed-byte #.(1+ *max-cube-address-length*))))
-  (*lisp::deftype grid-address-pvar-array-type (n) `(pvar (array (signed-byte #.(1+ *max-cube-address-length*)) (,n))))
-  (*lisp::deftype geometry-id-pvar-type () `(pvar (unsigned-byte #.(integer-length (1- *maximum-geometries-allowed*)))))
-  (*lisp::deftype geometry-rank-pvar-type () `(pvar (unsigned-byte #.(integer-length (1- *maximum-number-of-dimensions*)) )))
+  (*sim::deftype max-cube-address-pvar-type () `(pvar (unsigned-byte #.*max-cube-address-length*)))
+  (*sim::deftype max-grid-address-pvar-type () `(pvar (signed-byte #.(1+ *max-cube-address-length*))))
+  (*sim::deftype grid-address-pvar-array-type (n) `(pvar (array (signed-byte #.(1+ *max-cube-address-length*)) (,n))))
+  (*sim::deftype geometry-id-pvar-type () `(pvar (unsigned-byte #.(integer-length (1- *maximum-geometries-allowed*)))))
+  (*sim::deftype geometry-rank-pvar-type () `(pvar (unsigned-byte #.(integer-length (1- *maximum-number-of-dimensions*)) )))
   
   )
 

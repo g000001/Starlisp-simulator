@@ -186,13 +186,13 @@
   (eval `(in-package
           ,(if (eq select-*lisp :toggle)
              (if (eq *package* (find-package :*lisp))
-               :user
+               :cl-user
                :*lisp)
-             (if select-*lisp :*lisp :user))))
+             (if select-*lisp :*lisp :cl-user))))
   (format t "Default package is now ~A.~%" (package-name *package*))
   (values))
 
-(defun user::*lisp (&optional (select-*lisp :toggle))
+(defun cl-user::*lisp (&optional (select-*lisp :toggle))
   (*lisp select-*lisp))
 
 (defun non-negative-integer-p (x) (and (integerp x) (> x -1)))

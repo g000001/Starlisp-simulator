@@ -13,11 +13,13 @@
 ;;; Author:  JP Massar.
 
 
-(import-then-export '*lisp '*lisp '(load-patches))
+(import-then-export '*sim '*sim '(load-patches))
 
  
 (defun load-patches ()
-  (load "C:/Lispcode/Starsim/F20/patches.lisp")
+;  (load "C:/Lispcode/Starsim/F20/patches.lisp")
+;  (load "C:/Lispcode/Starsim/F20/patches.lisp")
+  (load "/u/mc/lisp/Lisp/StarLisp/sbcl/patches.lisp")
   )
 
 ;;; ===========================================================================

@@ -317,6 +317,8 @@
 	))
 
 
+;(defun code-char!! (code-pvar &optional (bits-pvar (!! 0)) (font-pvar (!! 0)))
+;; ansi
 (defun code-char!! (code-pvar &optional (bits-pvar (!! 0)) (font-pvar (!! 0)))
   (simple-pvar-argument!! code-pvar &opt bits-pvar font-pvar)
   (safety-check
@@ -335,7 +337,9 @@
 	      (font (aref font-array processor))
 	      (code (aref code-array processor))
 	      )
-	  (setf (aref return-array processor) (code-char code bits font))
+;	  (setf (aref return-array processor) (code-char code bits font))
+	  ;; ansi
+	  (setf (aref return-array processor) (code-char code))
 	  ))
       (make-non-void return-pvar)
       )

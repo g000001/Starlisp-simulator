@@ -13,9 +13,9 @@
 ;;; Author:  JP Massar.
 
 
-(defconstant *max-index-pvar-length* #.(1+ (truncate (log *array-total-size-limit 2))))
-(defconstant *max-single-index-pvar-length* #.(1+ (truncate (log *array-dimension-limit 2))))
-(defconstant *max-array-rank-pvar-length* #.(1+ (truncate (log *array-rank-limit 2))))
+(defconstant +max-index-pvar-length+ #.(1+ (truncate (log *array-total-size-limit 2))))
+(defconstant +max-single-index-pvar-length+ #.(1+ (truncate (log *array-dimension-limit 2))))
+(defconstant +max-array-rank-pvar-length+ #.(1+ (truncate (log *array-rank-limit 2))))
 
 ;;; Put the names of the ALIASED versions of the array accessor
 ;;; functions on the property lists of the array accessor function
@@ -898,7 +898,7 @@
   (flet
     ((foo ()
        (apply 'typed-vector!!
-	 `(pvar (unsigned-byte ,*max-index-pvar-length*))
+	 `(pvar (unsigned-byte ,+max-index-pvar-length+))
 	 (mapcar #'!! (*array-dimensions pvar-array))
 	 )))
     (safety-check (new-pvar-check pvar-array 'array-dimensions!!))

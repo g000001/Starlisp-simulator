@@ -84,56 +84,56 @@
   (when *convert-scalar-args-to-pvars*
     (let (result class type)
       (do* ((nextarg (when argument-descriptors (pop argument-descriptors))
-	             (when argument-descriptors (pop argument-descriptors))))
-	   ((null nextarg))
-	(if (symbolp nextarg)
-	    (case nextarg
-	      (&rest (setq class :&rest
-			   nextarg (pop argument-descriptors)))
-	      (&opt (setq class :&opt
-			  nextarg (pop argument-descriptors))
-		    (when (listp nextarg)
-		      (setq class :&opt-mult)))
-	      (&front-end (setq class :&front-end
-				nextarg (pop argument-descriptors))
-			  (when (listp nextarg)
-			    (setq class :&front-end-mult)))
-	      (otherwise (setq class :single)))
-	    (setq class :multiple))
-	(setq type (pop argument-descriptors))
-	(multiple-value-bind (declaration test conversion optimization)
-	    (conversion-for-type type)
-	  (when test ;;; if the type is one we know how to convert
-	    (case class
-	      (:single
-		(push (conversion-form-for nextarg test declaration conversion optimization)
-		      result))
-	      (:&opt
-		(push `(when ,nextarg
-			 ,(conversion-form-for nextarg test declaration conversion optimization))
-		      result))
-	      (:&opt-mult
-		(dolist (argname nextarg)
-		  (push `(when ,argname
-			  ,(conversion-form-for argname test declaration conversion optimization))
-			result)))
-	      (:&front-end
-		(push (conversion-form-for nextarg test declaration conversion optimization t)
-		      result))
-	      (:&front-end-mult
-		(dolist (argname nextarg)
-		  (push (conversion-form-for argname test declaration conversion optimization t)
-			result)))
-	      (:&rest 
-		(push (rest-conversion-form nextarg test declaration conversion optimization)
-		      result))
-	      (:multiple
-		(dolist (argname nextarg)
-		  (push (conversion-form-for argname test declaration conversion optimization)
-			result)))
-	      ))))
+                     (when argument-descriptors (pop argument-descriptors))))
+           ((null nextarg))
+        (if (symbolp nextarg)
+            (case nextarg
+              (&rest (setq class :&rest
+                           nextarg (pop argument-descriptors)))
+              (&opt (setq class :&opt
+                          nextarg (pop argument-descriptors))
+                    (when (listp nextarg)
+                      (setq class :&opt-mult)))
+              (&front-end (setq class :&front-end
+                                nextarg (pop argument-descriptors))
+                          (when (listp nextarg)
+                            (setq class :&front-end-mult)))
+              (otherwise (setq class :single)))
+            (setq class :multiple))
+        (setq type (pop argument-descriptors))
+        (multiple-value-bind (declaration test conversion optimization)
+            (conversion-for-type type)
+          (when test ;;; if the type is one we know how to convert
+            (case class
+              (:single
+                (push (conversion-form-for nextarg test declaration conversion optimization)
+                      result))
+              (:&opt
+                (push `(when ,nextarg
+                         ,(conversion-form-for nextarg test declaration conversion optimization))
+                      result))
+              (:&opt-mult
+                (dolist (argname nextarg)
+                  (push `(when ,argname
+                          ,(conversion-form-for argname test declaration conversion optimization))
+                        result)))
+              (:&front-end
+                (push (conversion-form-for nextarg test declaration conversion optimization t)
+                      result))
+              (:&front-end-mult
+                (dolist (argname nextarg)
+                  (push (conversion-form-for argname test declaration conversion optimization t)
+                        result)))
+              (:&rest 
+                (push (rest-conversion-form nextarg test declaration conversion optimization)
+                      result))
+              (:multiple
+                (dolist (argname nextarg)
+                  (push (conversion-form-for argname test declaration conversion optimization)
+                        result)))
+              ))))
       (when result
-	`(*lisp-i::*nocompile (when *convert-scalar-args-p* ,@(nreverse result)))))))
+        `(*lisp-i::*nocompile (when *convert-scalar-args-p* ,@(nreverse result)))))))
 
 ;;; A macro for simple cases:
 
@@ -161,28 +161,28 @@
     (when declaration
       (setq form `(the ,declaration ,form)))
     (if front-end-p
-	(setq form `(front-end!! ,form))
-	(setq form `(!! ,form)))))
+        (setq form `(front-end!! ,form))
+        (setq form `(!! ,form)))))
 
 (defun conversion-form-for (argname test &optional (declaration nil)
-				                   (conversion nil)
-						   (optimization nil)
-						   (front-end-p nil))
+                                                   (conversion nil)
+                                                   (optimization nil)
+                                                   (front-end-p nil))
   (let ((form
-	 `(if (,test ,argname)
-	      (setq ,argname ,(bang-bang-form-for argname declaration conversion front-end-p)))))
+         `(if (,test ,argname)
+              (setq ,argname ,(bang-bang-form-for argname declaration conversion front-end-p)))))
     (when optimization
       (setq form `(progn (setq ,argname (,optimization ,argname)) ,form)))
     form))
 
 (defun rest-conversion-form (argname test &optional (declaration nil)
-				                    (conversion nil)
-						    (optimization nil))
+                                                    (conversion nil)
+                                                    (optimization nil))
   `(do ((%arglist% ,argname (cdr %arglist%)))
        ((null %arglist%))
      ,@(when optimization `((rplaca %arglist% (,optimization (car %arglist%)))))
      (if (,test (car %arglist%))
-	 (rplaca %arglist% ,(bang-bang-form-for '(car %arglist%) declaration conversion)))))
+         (rplaca %arglist% ,(bang-bang-form-for '(car %arglist%) declaration conversion)))))
 
 ;;; This variable contains conversion information for all types
 ;;; that need to be converted (thus far).
@@ -256,8 +256,8 @@
 
 (defun boolean-optimize (thingy)
   (cond ((eq thingy t) t!!)
-	((eq thingy nil) nil!!)
-	(t thingy)))
+        ((eq thingy nil) nil!!)
+        (t thingy)))
 
 ;;; >>> Number: numberp exists
 
@@ -308,7 +308,7 @@
 (defun *defstructp (thingy)
   (let ((thing-type (type-of thingy)))
     (and (symbolp thing-type)
-	 (structure-pvar-type-known-*defstruct-type thing-type))))
+         (structure-pvar-type-known-*defstruct-type thing-type))))
 
 ;;; >>> legal-pvar-value: (pvar value) Any legal argument to !!
 
@@ -348,13 +348,13 @@
 ;;;   on the hardware, integer pvars, since that's the only way to represent them
 ;;;   in the simulator, "pvars" of the ugly data type
 
-(defconstant *bytespec-type* #+symbolics 'fixnum
-	                     #+:CCL (type-of (byte 1 0)) ;; 0 0 is illegal in Allegro
-			     #-(OR symbolics :CCL) (type-of (byte 0 0))) ;; this gives the nasty type in Lucid
+(defconstant +bytespec-type+ #+symbolics 'fixnum
+                             #+:CCL (type-of (byte 1 0)) ;; 0 0 is illegal in Allegro
+                             #-(OR symbolics :CCL) (type-of (byte 0 0))) ;; this gives the nasty type in Lucid
 
 (defun *bytespecp (thingy)
   (or
-    (typep thingy *bytespec-type*)
+    (typep thingy +bytespec-type+)
     #+LUCID (typep thingy 'integer) ;; allow integer bytespecs under Lucid
     ))
 
@@ -374,10 +374,10 @@
 
 (defun bytespec-optimize (thingy)
   #+(AND LUCID *LISP-HARDWARE) ;; only need to convert Lucid bytespecs on hardware
-  (if (eql (type-of thingy) *bytespec-type*)
+  (if (eql (type-of thingy) +bytespec-type+)
       (setq thingy (constant-byte!! (byte-size thingy) (byte-position thingy))))
   #+(AND LUCID *LISP-SIMULATOR)
-  (if (eql (type-of thingy) *bytespec-type*)
+  (if (eql (type-of thingy) +bytespec-type+)
       (setq thingy (byte!! (!! (byte-size thingy)) (!! (byte-position thingy)))))
   thingy)
 

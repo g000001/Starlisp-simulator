@@ -1,22 +1,22 @@
 ;;; -*- Mode: LISP; Syntax: Common-lisp; Package: User; Base: 10 -*-
 
-(in-package :user)
+(in-package :cl-user)
  
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (export '(user::ms user::msc user::mss user::mss-all user::make-system) 
-	  (find-package :user)))
+  (export '(cl-user::ms cl-user::msc cl-user::mss cl-user::mss-all cl-user::make-system) 
+          (find-package :cl-user)))
 #+OLD
-(defpackage :user
+(defpackage :cl-user
   (:export "MS" "MSC" "MSS" "MSS-ALL" "MAKE-SYSTEM"))
 
 #+Allegro
 (defpackage "CG-USER"
-  (:import-from "USER" "MS" "MSC" "MSS" "MSS-ALL" "MAKE-SYSTEM"))
+  (:import-from "CL-USER" "MS" "MSC" "MSS" "MSS-ALL" "MAKE-SYSTEM"))
 
 (defvar *all-possible-lisp-extensions* '(".cl" ".l" ".lsp" ".lisp" ""))
 
 (defvar *binary-lisp-extension*
-  #+(OR ALLEGRO CMU :CCL :ALLEGRO CORMANLISP) ".fasl"
+  #+(OR ALLEGRO CMU :CCL :ALLEGRO CORMANLISP SBCL) ".fasl"
   #+LISPWORKS ".fsl"
   #+:CLISP ".fas"
   #+SYMBOLICS ".bin" 
@@ -30,7 +30,8 @@
 ;;; this is where the make-system code looks for system definition
 ;;; files.  Change this as appropriate to your system.
 
-(defparameter *defsystem-search-path* '("C:/Lispcode/Makefiles/"))
+;(defparameter *defsystem-search-path* '("C:/Lispcode/Makefiles/"))
+(defparameter *defsystem-search-path* '("/share/sys/cl/src/starlisp-sbcl/"))
 
 (defun errmsg (format-string &rest format-args)
   (terpri *error-output*)
@@ -55,7 +56,7 @@
 (defun define-alias-prefix-char (char)
   (if (characterp char)
       (setq *alias-prefix-char-list*
-	    (union (list char) *alias-prefix-char-list*))
+            (union (list char) *alias-prefix-char-list*))
       (error "DEFINE-ALIAS-PREFIX-CHAR:  Argument (~A) is not a character" char)
     ))
 
@@ -66,9 +67,9 @@
 
 (defun undefine-alias (alias)
   (setq *alias-definition-list*
-	(remove-if #'(lambda (assoc-pair) (equal (car assoc-pair) alias))
-		   *alias-definition-list*
-	 )))
+        (remove-if #'(lambda (assoc-pair) (equal (car assoc-pair) alias))
+                   *alias-definition-list*
+         )))
 
 (defun define-alias (alias real-string)
   (when (or (null (stringp alias)) (null (stringp real-string)))
@@ -79,10 +80,10 @@
 
 (defun convert-alias-to-real-string (alias)
   (let ((real-string
-	  (cadr (assoc alias *alias-definition-list* :test #'string=))))
+          (cadr (assoc alias *alias-definition-list* :test #'string=))))
     (if (null real-string)
-	(error "CONVERT-ALIAS-TO-REAL-STRING: Alias (~A) not defined." alias)
-	real-string
+        (error "CONVERT-ALIAS-TO-REAL-STRING: Alias (~A) not defined." alias)
+        real-string
      )))
 
 (defun has-alias-prefix-char (string)
@@ -155,38 +156,38 @@
   
   (flet
       ((source-loaded? 
-	   (source-file)
-	 (member source-file 
-		 (get system-symbol :loaded-defsystem-files)
-		 :test #'string=
-		 ))
+           (source-file)
+         (member source-file 
+                 (get system-symbol :loaded-defsystem-files)
+                 :test #'string=
+                 ))
        (load-source-or-object
-	   (source-file object-file)
-	 (let ((file-to-load (or object-file source-file)))
-	   (unless (and (not dry-run) (null verbose))
-	     (fresh-line) 
-	     (format t ";; Make:  loading file ~S~%" file-to-load) 
-	     (force-output t))
-	   (unless dry-run (load file-to-load))
-	   ))
+           (source-file object-file)
+         (let ((file-to-load (or object-file source-file)))
+           (unless (and (not dry-run) (null verbose))
+             (fresh-line) 
+             (format t ";; Make:  loading file ~S~%" file-to-load) 
+             (force-output t))
+           (unless dry-run (load file-to-load))
+           ))
        (record-load 
-	   (source-file)
-	 (pushnew source-file (get system-symbol :loaded-defsystem-files) :test #'string=)
-	 )
+           (source-file)
+         (pushnew source-file (get system-symbol :loaded-defsystem-files) :test #'string=)
+         )
        (file-needs-compiling? 
-	   (source-file object-file)
-	 (or (null (probe-file object-file))
-	     (> (file-write-date source-file)
-		(file-write-date object-file)
-		)))
+           (source-file object-file)
+         (or (null (probe-file object-file))
+             (> (file-write-date source-file)
+                (file-write-date object-file)
+                )))
        (compile-source 
-	   (source-file object-file)
-	 (unless (and (not dry-run) (null verbose))
-	   (fresh-line) 
-	   (format t ";; Make:  compiling file ~S~%" source-file) 
-	   (force-output t))
-	 (unless dry-run (compile-file source-file :output-file object-file))
-	 )
+           (source-file object-file)
+         (unless (and (not dry-run) (null verbose))
+           (fresh-line) 
+           (format t ";; Make:  compiling file ~S~%" source-file) 
+           (force-output t))
+         (unless dry-run (compile-file source-file :output-file object-file))
+         )
        
        )
     
@@ -200,48 +201,48 @@
         
        (mapc
             
-	#'(lambda (form file)
+        #'(lambda (form file)
                 
-	    (when (and form (or dry-run (not (null verbose))))
-	      (fresh-line) (format t ";; Make:  evaluating ~S~%" form)
-	      )
-	    (unless dry-run (eval form))
+            (when (and form (or dry-run (not (null verbose))))
+              (fresh-line) (format t ";; Make:  evaluating ~S~%" form)
+              )
+            (unless dry-run (eval form))
                 
-	    (let ((source-file (source-code-file file))
-		  (object-file (object-code-file file))
-		  (changed nil)
-		  )
+            (let ((source-file (source-code-file file))
+                  (object-file (object-code-file file))
+                  (changed nil)
+                  )
                   
-	      (when (null (probe-file source-file))
-		(errmsg "~%File ~S does not exist~%" file)
-		(errmsg "Aborting make...~%")
-		(return-from make nil)
-		)
+              (when (null (probe-file source-file))
+                (errmsg "~%File ~S does not exist~%" file)
+                (errmsg "Aborting make...~%")
+                (return-from make nil)
+                )
                   
-	      ;; If not compiling, load the source file if necessary.
+              ;; If not compiling, load the source file if necessary.
                   
-	      (when (not compile-any)
-		(when (or load-all (not (source-loaded? source-file)))
-		  (load-source-or-object source-file nil)
-		  (record-load source-file)
-		  ))
+              (when (not compile-any)
+                (when (or load-all (not (source-loaded? source-file)))
+                  (load-source-or-object source-file nil)
+                  (record-load source-file)
+                  ))
                   
-	      (when compile-any
-		(when (or compile-all (file-needs-compiling? source-file object-file))
-		  (compile-source source-file object-file)
-		  (setq changed t)
-		  )
-		(when (or load-all changed (not (source-loaded? source-file)))
-		  (load-source-or-object source-file object-file)
-		  (record-load source-file)
-		  ))
+              (when compile-any
+                (when (or compile-all (file-needs-compiling? source-file object-file))
+                  (compile-source source-file object-file)
+                  (setq changed t)
+                  )
+                (when (or load-all changed (not (source-loaded? source-file)))
+                  (load-source-or-object source-file object-file)
+                  (record-load source-file)
+                  ))
                   
-	      ))
+              ))
           
-	forms
-	filelist
+        forms
+        filelist
           
-	))
+        ))
       
       t
       
@@ -255,13 +256,13 @@
 
   (mapc
     #'(lambda (searchpath)
-	(let ((pathname 
-		(concatenate 'string 
-		   searchpath system-name *defsystem-suffix*)))
-	  (when (probe-file pathname)
-	    (return-from find-defsystem pathname)
-	   )
-	 ))
+        (let ((pathname 
+                (concatenate 'string 
+                   searchpath system-name *defsystem-suffix*)))
+          (when (probe-file pathname)
+            (return-from find-defsystem pathname)
+           )
+         ))
     *defsystem-search-path*
    )
   nil
@@ -270,7 +271,7 @@
 
 (defun check-file-specification (file-spec)
   (if (or (null (consp file-spec))
-	  (not (every #'stringp file-spec)))
+          (not (every #'stringp file-spec)))
       (errmsg "MAKE-SYSTEM-FILE-LIST: Bad file specification: ~S" file-spec)
     (combine-string-list-to-form-full-file-path file-spec)
    ))
@@ -308,11 +309,11 @@
 
   (when (not (stringp system-name))
     (if (symbolp system-name) 
-	(setq system-name (symbol-name system-name))
+        (setq system-name (symbol-name system-name))
       (progn
-	(errmsg "Argument to make-system is not a string: ~S~%" system-name)
-	(return-from make-system nil)
-	)))
+        (errmsg "Argument to make-system is not a string: ~S~%" system-name)
+        (return-from make-system nil)
+        )))
        
   (let ((full-system-pathname (find-defsystem system-name))
         (system-symbol (intern system-name (find-package :keyword)))

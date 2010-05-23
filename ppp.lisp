@@ -666,8 +666,8 @@
   (let ((geometry-id (address-object-cached-geometry-id address-object-pvar)))
 
     ;; Figure out the rank in each processor.
-    ;; Use -1 if we have *illegal-geometry-id*.
-    ;; For printing, we will print out NIL for the rank if *illegal-geometry-id*.
+    ;; Use -1 if we have +illegal-geometry-id+.
+    ;; For printing, we will print out NIL for the rank if +illegal-geometry-id+.
 
     (*let (rank printing-rank)
       (declare (type (pvar (signed-byte 32)) rank))
@@ -676,7 +676,7 @@
 	(*map-geometries
 	  #'(lambda (id)
 	      (*set rank
-		    (if (eql id *illegal-geometry-id*)
+		    (if (eql id +illegal-geometry-id+)
 			(!! -1)
 			(!! (geometry-rank (geometry-from-id id)))
 			)))
@@ -699,14 +699,14 @@
 	    ))
 
       ;; Print out the cube address.  This should always be 0 for
-      ;; processors with *illegal-geometry-id*.
+      ;; processors with +illegal-geometry-id+.
 
       (ppp (alias!! (address-object-cube-address!! address-object-pvar))
 	   :title "Cube Address     " :start start :end end :mode mode
 	   )
 
       ;; Print out the grid coordinates.
-      ;; Print out NIL for *illegal-geometry-id* and also
+      ;; Print out NIL for +illegal-geometry-id+ and also
       ;; for those geometry id's which do not have an nth
       ;; grid address.  (i.e., if there are two different
       ;; geometries, and one is 2d and one is 3d, then

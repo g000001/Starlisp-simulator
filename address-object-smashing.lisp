@@ -25,14 +25,14 @@
     ))
 
 (defmacro illegal-geometry-p!! (ao)
-  `(=!! (!! (the fixnum *illegal-geometry-id*)) (address-object-geometry-id!! (the (pvar address-object) ,ao)))
+  `(=!! (!! (the fixnum +illegal-geometry-id+)) (address-object-geometry-id!! (the (pvar address-object) ,ao)))
   )
 
 ;;; An address object is legal iff every active processor
 ;;; contains a valid geometry id.
 
 (defun legal-address-object-p (ao)
-  (*and (/=!! (!! (the fixnum *illegal-geometry-id*)) (address-object-geometry-id!! (the (pvar address-object) ao))))
+  (*and (/=!! (!! (the fixnum +illegal-geometry-id+)) (address-object-geometry-id!! (the (pvar address-object) ao))))
   )
 
 (defun check-for-legal-address-object (ao function)
@@ -55,7 +55,7 @@
   (when check-legality (check-for-legal-address-object ao function))
   (*all
     (declare (return-pvar-p nil))
-    (*when (/=!! (!! (the fixnum *illegal-geometry-id*)) (address-object-geometry-id!! (the (pvar address-object) ao)))
+    (*when (/=!! (!! (the fixnum +illegal-geometry-id+)) (address-object-geometry-id!! (the (pvar address-object) ao)))
       (declare (return-pvar-p nil))
       (let (min max)
 	(when (*or t!!)
@@ -432,7 +432,7 @@
 
 	  (*with-vp-set x1
 
-	    (format t "~%Testing coercion of ao with subselection with *illegal-geometry-id* some places into other geometry")
+	    (format t "~%Testing coercion of ao with subselection with +illegal-geometry-id+ some places into other geometry")
 
 	    (*let (ao1)
 	      (declare (type (pvar address-object) ao1))
@@ -440,7 +440,7 @@
 	      (*setf (address-object-geometry-id!! ao1)
 		     (if!! (evenp!! (self-address!!))
 			   (!! (vp-set-geometry-id x2))
-			   (!! *illegal-geometry-id*)
+			   (!! +illegal-geometry-id+)
 			   ))
 	      (*when (evenp!! (self-address!!))
 		(smash-address-object-to-new-vp-set!! ao1 x1)

@@ -1,6 +1,6 @@
 ;;; -*- SYNTAX: COMMON-LISP; MODE: LISP; BASE: 10; PACKAGE: *LISP; -*-
 
-(in-package :*lisp)
+(in-package :*sim)
 						
 ;;;; Author:  JP Massar.
 

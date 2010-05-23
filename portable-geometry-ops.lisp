@@ -16,7 +16,7 @@
 ;;; Useful utilities.
 
 
-(declaim (special *first-legal-geometry-id* *next-geometry-id*
+(declaim (special +first-legal-geometry-id+ *next-geometry-id*
                   *maximum-geometries-allowed* *all-geometries-array*
                   *illegal-geometry-id*
                   ))
@@ -37,7 +37,7 @@
 (defmacro do-for-active-geometries ((geometry) &body body)
   (assert (symbolp geometry))
   (let ((geometry-id-symbol (gensym "GEOMETRY-ID-")))
-    `(do ((,geometry-id-symbol *first-legal-geometry-id* (1+ ,geometry-id-symbol)))
+    `(do ((,geometry-id-symbol +first-legal-geometry-id+ (1+ ,geometry-id-symbol)))
 	 ((= ,geometry-id-symbol *maximum-geometries-allowed*))
        (let ((,geometry (aref *all-geometries-array* ,geometry-id-symbol)))
 	 (when ,geometry
@@ -51,7 +51,7 @@
 
 (defun reinitialize-*lisp-geometries ()
   (dotimes (j *maximum-geometries-allowed*) (setf (aref *all-geometries-array* j) nil))
-  (setq *next-geometry-id* *first-legal-geometry-id*)
+  (setq *next-geometry-id* +first-legal-geometry-id+)
   (setf (aref *all-geometries-array* *illegal-geometry-id*) nil)
   )
 
@@ -67,7 +67,7 @@
 
 (defun allocate-next-geometry ()
   (when (eql (1+ *next-geometry-id*) *maximum-geometries-allowed*)
-    (do ((j *first-legal-geometry-id* (1+ j)))
+    (do ((j +first-legal-geometry-id+ (1+ j)))
 	((eql j *maximum-geometries-allowed*))
       (when (null (aref *all-geometries-array* j))
 	(return-from allocate-next-geometry (make-geometry-at-geometry-array-slot j))

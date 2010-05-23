@@ -58,12 +58,12 @@
 ;;           It destroys nicknames and use lists unless provided again.
 ;; Screw it for now.
 
-#-(OR :CORMANLISP :CLISP)
-(user::defpackage-with-lists-symbols "*SIM"
-    (:import-from-package "*SIM-I"
-  :import-from-list-symbol *simulator-exported-functions*
-  :export-list-symbol *simulator-exported-functions*
-  ))
+#-(OR :CORMANLISP :CLISP :clozure)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (cl-user::defpackage-with-lists-symbols "*SIM"
+      (:import-from-package "*SIM-I"
+       :import-from-list-symbol *simulator-exported-functions*
+       :export-list-symbol *simulator-exported-functions*  )))
 
 
 ;;;; Put *LISP-SIMULATOR on *FEATURES* list so users can conditionize

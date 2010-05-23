@@ -19,13 +19,93 @@
 
 (deftype string-char () 'character)
 
+; orig ;(deftype pvar (&optional (element-type '*))
+; orig ;  ;; I have to return a satisfies type with a closure so that typep can work.
+; orig ;  ;; But, returning a closure will blow up both subtypep and the compiler on lucid.
+; orig ;  (let ((closure (*lisp-i::pvar-type-predicate 
+; orig ;                  (cadr (*lisp-i::canonical-pvar-type `(pvar ,element-type))))))
+; orig ;    `(satisfies ,closure)))
+
+;; type-system-deftypes.lisp
+#|(deftype pvar (&optional (element-type '*))
+  ;; I have to return a satisfies type with a closure so that typep can work.
+  ;; But, returning a closure will blow up both subtypep and the compiler on lucid.
+  (let ((g (gentemp))
+        (closure (*lisp-i::pvar-type-predicate 
+                  (cadr (*lisp-i::canonical-pvar-type `(pvar ,element-type))))))
+;      (format t "////////// ~S //////////~%" closure)
+      (setf (symbol-function g) 
+            (lambda (&rest args) (apply closure args)))
+      `(satisfies ,g)))|#
+
+(defvar *pvar-satisfy-tem* '*)
+
+(defun pvar-satisfy-func (&rest args)
+  (apply (*lisp-i::pvar-type-predicate 
+          (cadr (*lisp-i::canonical-pvar-type `(pvar ,*pvar-satisfy-tem*))))
+         args))
+
 (deftype pvar (&optional (element-type '*))
+  (let ((*pvar-satisfy-tem* element-type))
+    `(satisfies pvar-satisfy-func)))
+
+;(cond ((symbolp closure) (coerce closure 'function))
+;                  ('T ))
+
+;(fboundp '(lambda (x) x))
+
+#|(cond ((functionp closure) closure)
+                ((fboundp closure) (coerce closure 'function))
+                ('T closure))|#
+
+;(defun *segment-set-p (&rest x)  x) ;; 謎
+;(defun *SIM::*WORD-P  (&rest x)  x) ;; 謎
+
+;(COERCE #'*SIM-I::*SEGMENT-SET-P 'FUNCTION)
+
+;(coerce listp 'function)
+
+;(LAMBDA (OBJECT) (UNSIGNED-PVARP OBJECT LENGTH))
+
+;(SYMBOL-FUNCTION (LAMBDA (*SIM-I::OBJECT) (*SIM-I::UNSIGNED-PVARP *SIM-I::OBJECT LENGTH)))
+
+#|(LAMBDA (*SIM-I::OBJECT)
+    (*SIM-I::UNSIGNED-PVARP *SIM-I::OBJECT LENGTH))|#
+
+;(*lisp-i::pvar-type-predicate 
+; (cadr (*lisp-i::canonical-pvar-type `(pvar *))))
+
+;(*lisp-i::canonical-pvar-type `(pvar *))
+
+;(typep 'foo 'pvar)
+
+#|(defun my-pvarp (&optional element-type '*)
+  (funcall (*lisp-i::pvar-type-predicate 
+            (cadr (*lisp-i::canonical-pvar-type `(pvar ,element-type))))))|#
+
+#|(defun my-pvarp-* ()
+  (funcall (*lisp-i::pvar-type-predicate 
+            (cadr (*lisp-i::canonical-pvar-type `(pvar '*))))))|#
+
+
+;(typep x '(satisfies p)) is equivalent to (if (p x) t nil).
+
+#|(defun my-pvarp (&optional (element-type '*))
   ;; I have to return a satisfies type with a closure so that typep can work.
   ;; But, returning a closure will blow up both subtypep and the compiler on lucid.
   (let ((closure (*lisp-i::pvar-type-predicate 
                   (cadr (*lisp-i::canonical-pvar-type `(pvar ,element-type))))))
-    `(satisfies ,closure)))
+    (if (funcall closure element-type)
+        t
+        nil)))|#
 
+#|(*lisp-i::pvar-type-predicate 
+                  (cadr (*lisp-i::canonical-pvar-type `(pvar 'foo))))|#
+
+#|(deftype pvar (&optional (element-type '*))
+  ;; I have to return a satisfies type with a closure so that typep can work.
+  ;; But, returning a closure will blow up both subtypep and the compiler on lucid.
+  `(satisfies pvarp))|#
 
 (deftype boolean-pvar ()
   `(pvar boolean))

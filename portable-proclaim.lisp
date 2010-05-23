@@ -191,8 +191,8 @@ pvar type of the proper type.
      ,@(mapcar #'(lamda (ds) `(starlisp-proclaim ',ds)) decl-specs)
      ))
 
-(defmacro declaim (&rest decl-specs) `(*declaim ,@decl-specs))
-
+;(defmacro declaim (&rest decl-specs) `(*declaim ,@decl-specs))
+(defmacro declaim (&rest decl-specs) ())
 
 (defun proclaimed-type (symbol &optional (default-type 't))
   (get symbol :*lisp-type default-type))
@@ -223,7 +223,7 @@ pvar type of the proper type.
   (if (atom type) (setq type (list type)))
   (let ((expander (get (first type) :*lisp-deftype)))
     (if (null expander)
-	nil
+        nil
       (apply expander (rest type))
       )))
 
@@ -240,28 +240,28 @@ pvar type of the proper type.
   (let ((*print-level* 10))
     (flet
       ((ftype-error (string)
-	 (format
-	   t
-	   "~%~%The FTYPE proclamation, ~S, is not of the form ~@
+         (format
+           t
+           "~%~%The FTYPE proclamation, ~S, is not of the form ~@
             (ftype (function (&rest <argument types>) <result type>) &rest function-names).~@
             You might have your parentheses misplaced."
-	   ftype-proclamation
-	   )
-	 (error "~A" string)
-	 ))
+           ftype-proclamation
+           )
+         (error "~A" string)
+         ))
       (cond
-	((= (length ftype-proclamation) 1) (ftype-error "There is nothing after the FTYPE."))
-	((= (length ftype-proclamation) 2) (ftype-error "No function-names were provided."))
-	((not (listp (second ftype-proclamation))) (ftype-error "The FUNCTION specification is not a list"))
-	((not (every #'symbolp (cddr ftype-proclamation))) (ftype-error "The FUNCTION-NAMES are not all symbols"))
-	)
+        ((= (length ftype-proclamation) 1) (ftype-error "There is nothing after the FTYPE."))
+        ((= (length ftype-proclamation) 2) (ftype-error "No function-names were provided."))
+        ((not (listp (second ftype-proclamation))) (ftype-error "The FUNCTION specification is not a list"))
+        ((not (every #'symbolp (cddr ftype-proclamation))) (ftype-error "The FUNCTION-NAMES are not all symbols"))
+        )
       (let ((function-spec (second ftype-proclamation)))
-	(cond
-	  ((not (eq 'function (first function-spec))) (ftype-error "The FUNCTION specification does not begin with FUNCTION"))
-	  ((< (length function-spec) 3) (ftype-error "The FUNCTION specification does not specify a result type"))
-	  ((> (length function-spec) 3) (ftype-error "The FUNCTION specification specifies more than one result type"))
-	  ((not (listp (second function-spec))) (ftype-error "The FUNCTION specification argument list is not a list"))
-	  )))
+        (cond
+          ((not (eq 'function (first function-spec))) (ftype-error "The FUNCTION specification does not begin with FUNCTION"))
+          ((< (length function-spec) 3) (ftype-error "The FUNCTION specification does not specify a result type"))
+          ((> (length function-spec) 3) (ftype-error "The FUNCTION specification specifies more than one result type"))
+          ((not (listp (second function-spec))) (ftype-error "The FUNCTION specification argument list is not a list"))
+          )))
     nil
     ))
 
@@ -392,37 +392,37 @@ pvar type of the proper type.
   (case (car decl-spec)
     (special
       (dolist (variable (cdr decl-spec))
-	(remprop variable 'special)))
+        (remprop variable 'special)))
     (ftype
       (dolist (function (cddr decl-spec))
-	(remove-function-type function)))
+        (remove-function-type function)))
     (function
       (if (and (cddr decl-spec) (listp (caddr decl-spec)))
-	  (remprop (cadr decl-spec) 'function-type)
-	  (dolist (variable (cdr decl-spec))
-	    (remprop variable 'type))))
+          (remprop (cadr decl-spec) 'function-type)
+          (dolist (variable (cdr decl-spec))
+            (remprop variable 'type))))
     ((inline notinline))
     ((optimize *optimize)
       (dolist (quality-value (cdr decl-spec))
-	(let ((quality (if (consp quality-value) (car quality-value) quality-value)))
-	  (case quality
-	    (speed (setq *speed* 1))
-	    (safety (setq *safety* 1))
-	    (space (setq *space* 1))
-	    (compilation-speed (setq *compilation-speed* 1))
-	    (otherwise
-	      (error "Invalid quality ~S for optimize proclamation.~
+        (let ((quality (if (consp quality-value) (car quality-value) quality-value)))
+          (case quality
+            (speed (setq *speed* 1))
+            (safety (setq *safety* 1))
+            (space (setq *space* 1))
+            (compilation-speed (setq *compilation-speed* 1))
+            (otherwise
+              (error "Invalid quality ~S for optimize proclamation.~
                     Only SPEED, SAFETY, COMPILATION-SPACE, and SPACE are allowed." quality))))))
     (declaration
       (dolist (declaration (cdr decl-spec))
-	(remprop declaration 'declaration)))
+        (remprop declaration 'declaration)))
     (ignore
       (dolist (variable (cdr decl-spec))
-	(remprop variable 'ignore)))
+        (remprop variable 'ignore)))
     (type
       (dolist (variable (cddr decl-spec))
-	(remprop variable 'type)
-	(remove-variable-descriptor variable)))
+        (remprop variable 'type)
+        (remove-variable-descriptor variable)))
     (*defun
       (dolist (function (cdr decl-spec)) nil)) ;(unproclaim-*defun-1 function)
 
@@ -437,7 +437,7 @@ pvar type of the proper type.
            ((proclaimed-declaration-p (car decl-spec))
             nil
             )
-	    (t 
+            (t 
       (warn "Invalid decl-spec ~S to unproclaim, retrying with (TYPE ~{~S~^ ~})." decl-spec decl-spec)
       (return-from starlisp-unproclaim (unproclaim (cons 'type decl-spec)))))))
   nil)
@@ -462,28 +462,28 @@ pvar type of the proper type.
      type)
     (integer
       (if (consp type)
-	  `(integer ,(or (cadr type) '*) ,(or (caddr type) '*))
-	  '(integer * *)))
+          `(integer ,(or (cadr type) '*) ,(or (caddr type) '*))
+          '(integer * *)))
     (mod
       (let ((limit (if (consp type) (or (cadr type) '*) '*)))
-	`(integer 0 ,(if (eq limit '*) '* (list limit)))))
+        `(integer 0 ,(if (eq limit '*) '* (list limit)))))
     (unsigned-byte
       (let ((limit (if (consp type) (or (cadr type) '*) '*)))
-	`(integer 0 ,(if (eq limit '*) '* (list (simplify-expression (expt2-symbol) limit))))))
+        `(integer 0 ,(if (eq limit '*) '* (list (simplify-expression (expt2-symbol) limit))))))
     (signed-byte
       (let* ((limit (if (consp type) (or (cadr type) '*) '*))
-	     (real-limit (if (eq limit '*) '* (simplify-expression (expt2-1-symbol) limit))))
-	`(integer ,(if (integerp real-limit)
-		       (- real-limit)
-		       (list (simplify-expression '- -1 real-limit)))
-		  (,real-limit))))
+             (real-limit (if (eq limit '*) '* (simplify-expression (expt2-1-symbol) limit))))
+        `(integer ,(if (integerp real-limit)
+                       (- real-limit)
+                       (list (simplify-expression '- -1 real-limit)))
+                  (,real-limit))))
     (bit '(integer 0 1))
     (fixnum '(integer #.most-negative-fixnum #.most-positive-fixnum))
     (bignum '(or (integer * (#.most-negative-fixnum)) (integer (#.most-positive-fixnum) *)))
     ((float short-float single-float double-float long-float)
      (if (consp type)
-	 `(,(car type) ,(or (cadr type) '*) ,(or (caddr type) '*))
-	 `(,type * *)))
+         `(,(car type) ,(or (cadr type) '*) ,(or (caddr type) '*))
+         `(,type * *)))
     (list
       `(or cons null))
     (rational
@@ -501,16 +501,16 @@ pvar type of the proper type.
       `(simple-bit-vector ,@(if (and (consp type) (cdr type)) (cdr type) '(*))))
     (array
       `(array
-	 ,(if (and (consp type) (cadr type)) (or (cadr (canonical-pvar-type `(pvar ,(cadr type)))) (cadr type) '*) '*)
-	 ,@(if (and (consp type) (cddr type)) (cddr type) '(*))))
+         ,(if (and (consp type) (cadr type)) (or (cadr (canonical-pvar-type `(pvar ,(cadr type)))) (cadr type) '*) '*)
+         ,@(if (and (consp type) (cddr type)) (cddr type) '(*))))
     (simple-array
       `(simple-array
-	 ,(if (and (consp type) (cadr type)) (or (cadr (canonical-pvar-type `(pvar ,(cadr type)))) (cadr type) '*) '*)
-	 ,@(if (and (consp type) (cddr type)) (cddr type) '(*))))
+         ,(if (and (consp type) (cadr type)) (or (cadr (canonical-pvar-type `(pvar ,(cadr type)))) (cadr type) '*) '*)
+         ,@(if (and (consp type) (cddr type)) (cddr type) '(*))))
     (vector
       `(array
-	 ,(if (and (consp type) (cadr type)) (or (cadr (canonical-pvar-type `(pvar ,(cadr type)))) (cadr type) '*) '*)
-	 (,@(if (and (consp type) (cddr type)) (cddr type) '(*)))))
+         ,(if (and (consp type) (cadr type)) (or (cadr (canonical-pvar-type `(pvar ,(cadr type)))) (cadr type) '*) '*)
+         (,@(if (and (consp type) (cddr type)) (cddr type) '(*)))))
     (simple-vector
       `(array t (,@(if (and (consp type) (cdr type)) (cdr type) '(*)))))
     ;; Complex.?
@@ -535,196 +535,196 @@ pvar type of the proper type.
 
 (defun canonical-type (type &optional canonical-front-end-type (syntax-check nil))
   (cond ((standard-type-p type)
-	 (if canonical-front-end-type (canonical-front-end-type type) type))
-	((eq type 'pvar)
-	 '(pvar *))
-	((eq type 'fixnum)
-	 `(integer #.most-negative-fixnum #.most-positive-fixnum))
-	((or (equal type '(member nil t)) (equal type '(member t nil)) (eq type 'boolean))
-	 'boolean)
-	((eq type 'front-end)
-	 'front-end)
-	((eq type 'structure)
-	 (if canonical-front-end-type '(structure *) 'structure))
-	((eq type 'defined-float) (if canonical-front-end-type '(float * *) 'float))
-	#+symbolics
-	((and (symbolp type) (get type 'si:defstruct-description))
-	 (if canonical-front-end-type `(structure ,type) type))
-	#+lucid
-	((and (symbolp type) (lucid::structure-type-p type))
-	 (if canonical-front-end-type `(structure ,type) type))
-  	#+cmu
-  	((and (symbolp type) (get type 'lisp::%structure-definition))
-  	 (if canonical-front-end-type `(structure ,type) type))
-	((atom type)
-	 (canonical-type (or (expand-one-deftype type) (return-from canonical-type nil))))
-	((eq (car type) 'member)
-	 (let ((members (cdr type)))
-	   (cond ((every #'integerp members)
-		  (canonical-type `(integer ,(apply #'min members) ,(apply #'max members)) canonical-front-end-type syntax-check))
-		 ((every #'characterp members)
-		  (if (every #'string-char-p members)
-		      'string-char
-		      'character))
-		 (t type))))
-	((eq (car type) 'defined-float)
-	 `(defined-float ,(or (cadr type) '*) ,(or (caddr type) '*)))
-	((standard-type-p (car type))
-	 (if canonical-front-end-type (canonical-front-end-type type) type))
-	((member (car type) '(and or not member satisfies))
-	 type)
-	((eq (car type) 'structure) ; wonder if I should bother with this?
-	 (if (or (null (cadr type)) (eq (cadr type) '*))
-	     'structure
-	     (if canonical-front-end-type type (cadr type))))
-	((eq (car type) 'pvar)
-	 (let* ((pvar-type (if syntax-check (canonical-pvar-type (valid-pvar-type-p type t)) (canonical-pvar-type type)))
-		(atomic-element-type nil)
-		(element-type (cadr pvar-type)))
-	   (case (setq atomic-element-type (if (consp element-type) (car element-type) element-type))
-	     ((unsigned-byte signed-byte)
-	      (let ((length (cadr element-type)))
-		(if (numberp length)
-		    (if (integerp length)
-			(if (<= 1 length)
-			    (check-paris-restriction nil length '*maximum-integer-length*
-						     "Certain operations can not handle integer pvars with length")
-			    (error "Integer pvars must have a positive length instead of ~S." length))
-			(error "Integer pvars must have an integer length instead of ~S." length)))))
-	     ((defined-float complex)
-	       (let* ((complexp (eq atomic-element-type 'complex))
-		      (element-type (if complexp (cadr element-type) element-type))
-		      (mantissa (cadr element-type)) (exponent (caddr element-type)))
-		 (if (numberp mantissa)
-		     (if (integerp mantissa)
-			 (if (<= 1 mantissa)
-			     (check-paris-restriction nil mantissa '*maximum-significand-length*
-						      (if complexp
-							  "Certain operations can not handle complex pvars with mantissa"
-							  "Certain operations can not handle float pvars with mantissa"))
-			     (error "~:[Float~;Complex~] pvars must have a positive mantissa length instead of ~S."
-				    complexp mantissa))
-			 (error "~:[Float~;Complex~] pvars must have an integer mantissa length instead of ~S."
-				complexp mantissa)))
-		 (if (numberp exponent)
-		     (if (integerp exponent)
-			 (if (<= 1 exponent)
-			     (check-paris-restriction nil exponent '*maximum-exponent-length*
-						      (if complexp
-							  "Certain operations can not handle complex pvars with exponent"
-							  "Certain operations can not handle float pvars with exponent"))
-			     (error "~:[Float~;Complex~] pvars must have a positive exponent length instead of ~S."
-				    complexp exponent))
-			 (error "~:[Float~;Complex~] pvars must have an integer exponent length instead of ~S."
-				complexp exponent)))
-		 (if (and (integerp exponent) (integerp mantissa))
-		     (if (not (and (>= exponent 2) (>= mantissa 1) (>= (expt 2 (1- exponent)) (1+ mantissa))))
-			 (warn "Certain operations can not handle ~:[float~;complex~] pvars with format {~D,~D}."
-			       complexp mantissa exponent))))))
-	   pvar-type))
-	((member (car type)
-		 `(#+symbolics si:xr-bq-list #+symbolics si:xr-bq-append #+symbolics si:xr-bq-nconc
-		   #+symbolics si:xr-bq-cons #+symbolics si:xr-bq-list*
-		   #+lcl3.0 lrs:bq-list #+lcl3.0 lrs:bq-append #+lcl3.0 lrs:bq-nconc
-		   #+lcl3.0 lrs:bq-cons #+lcl3.0 lrs:bq-list*
-		   cons nth nthcdr first second third fourth fifth sixth seventh eighth ninth tenth
-		   car cdr caar cadr cdar cddr caaar caadr cadar caddr cdaar cdadr cddar cdddr 
-		   caaaar caaadr caadar caaddr cadaar cadadr caddar cadddr 
-		   cdaaar cdaadr cdadar cdaddr cddaar cddadr cdddar cddddr 
-		   last list list* append copy-list copy-alist copy-tree revappend nconc nreconc butlast nbutlast
-		   ldiff rplaca rplacd subst subst-if subst-if-not nsubst nsubst-if nsubst-if-not sublis
-		   nsublis assoc assoc-if assoc-if-not rassoc rassoc-if rassoc-if-not 
-		   ))
-	 t)
-	(t (canonical-type (or (expand-one-deftype type)
-			       (return-from canonical-type nil))))))
+         (if canonical-front-end-type (canonical-front-end-type type) type))
+        ((eq type 'pvar)
+         '(pvar *))
+        ((eq type 'fixnum)
+         `(integer #.most-negative-fixnum #.most-positive-fixnum))
+        ((or (equal type '(member nil t)) (equal type '(member t nil)) (eq type 'boolean))
+         'boolean)
+        ((eq type 'front-end)
+         'front-end)
+        ((eq type 'structure)
+         (if canonical-front-end-type '(structure *) 'structure))
+        ((eq type 'defined-float) (if canonical-front-end-type '(float * *) 'float))
+        #+symbolics
+        ((and (symbolp type) (get type 'si:defstruct-description))
+         (if canonical-front-end-type `(structure ,type) type))
+        #+lucid
+        ((and (symbolp type) (lucid::structure-type-p type))
+         (if canonical-front-end-type `(structure ,type) type))
+        #+cmu
+        ((and (symbolp type) (get type 'lisp::%structure-definition))
+         (if canonical-front-end-type `(structure ,type) type))
+        ((atom type)
+         (canonical-type (or (expand-one-deftype type) (return-from canonical-type nil))))
+        ((eq (car type) 'member)
+         (let ((members (cdr type)))
+           (cond ((every #'integerp members)
+                  (canonical-type `(integer ,(apply #'min members) ,(apply #'max members)) canonical-front-end-type syntax-check))
+                 ((every #'characterp members)
+                  (if (every #'string-char-p members)
+                      'string-char
+                      'character))
+                 (t type))))
+        ((eq (car type) 'defined-float)
+         `(defined-float ,(or (cadr type) '*) ,(or (caddr type) '*)))
+        ((standard-type-p (car type))
+         (if canonical-front-end-type (canonical-front-end-type type) type))
+        ((member (car type) '(and or not member satisfies))
+         type)
+        ((eq (car type) 'structure) ; wonder if I should bother with this?
+         (if (or (null (cadr type)) (eq (cadr type) '*))
+             'structure
+             (if canonical-front-end-type type (cadr type))))
+        ((eq (car type) 'pvar)
+         (let* ((pvar-type (if syntax-check (canonical-pvar-type (valid-pvar-type-p type t)) (canonical-pvar-type type)))
+                (atomic-element-type nil)
+                (element-type (cadr pvar-type)))
+           (case (setq atomic-element-type (if (consp element-type) (car element-type) element-type))
+             ((unsigned-byte signed-byte)
+              (let ((length (cadr element-type)))
+                (if (numberp length)
+                    (if (integerp length)
+                        (if (<= 1 length)
+                            (check-paris-restriction nil length '*maximum-integer-length*
+                                                     "Certain operations can not handle integer pvars with length")
+                            (error "Integer pvars must have a positive length instead of ~S." length))
+                        (error "Integer pvars must have an integer length instead of ~S." length)))))
+             ((defined-float complex)
+               (let* ((complexp (eq atomic-element-type 'complex))
+                      (element-type (if complexp (cadr element-type) element-type))
+                      (mantissa (cadr element-type)) (exponent (caddr element-type)))
+                 (if (numberp mantissa)
+                     (if (integerp mantissa)
+                         (if (<= 1 mantissa)
+                             (check-paris-restriction nil mantissa '*maximum-significand-length*
+                                                      (if complexp
+                                                          "Certain operations can not handle complex pvars with mantissa"
+                                                          "Certain operations can not handle float pvars with mantissa"))
+                             (error "~:[Float~;Complex~] pvars must have a positive mantissa length instead of ~S."
+                                    complexp mantissa))
+                         (error "~:[Float~;Complex~] pvars must have an integer mantissa length instead of ~S."
+                                complexp mantissa)))
+                 (if (numberp exponent)
+                     (if (integerp exponent)
+                         (if (<= 1 exponent)
+                             (check-paris-restriction nil exponent '*maximum-exponent-length*
+                                                      (if complexp
+                                                          "Certain operations can not handle complex pvars with exponent"
+                                                          "Certain operations can not handle float pvars with exponent"))
+                             (error "~:[Float~;Complex~] pvars must have a positive exponent length instead of ~S."
+                                    complexp exponent))
+                         (error "~:[Float~;Complex~] pvars must have an integer exponent length instead of ~S."
+                                complexp exponent)))
+                 (if (and (integerp exponent) (integerp mantissa))
+                     (if (not (and (>= exponent 2) (>= mantissa 1) (>= (expt 2 (1- exponent)) (1+ mantissa))))
+                         (warn "Certain operations can not handle ~:[float~;complex~] pvars with format {~D,~D}."
+                               complexp mantissa exponent))))))
+           pvar-type))
+        ((member (car type)
+                 `(#+symbolics si:xr-bq-list #+symbolics si:xr-bq-append #+symbolics si:xr-bq-nconc
+                   #+symbolics si:xr-bq-cons #+symbolics si:xr-bq-list*
+                   #+lcl3.0 lrs:bq-list #+lcl3.0 lrs:bq-append #+lcl3.0 lrs:bq-nconc
+                   #+lcl3.0 lrs:bq-cons #+lcl3.0 lrs:bq-list*
+                   cons nth nthcdr first second third fourth fifth sixth seventh eighth ninth tenth
+                   car cdr caar cadr cdar cddr caaar caadr cadar caddr cdaar cdadr cddar cdddr 
+                   caaaar caaadr caadar caaddr cadaar cadadr caddar cadddr 
+                   cdaaar cdaadr cdadar cdaddr cddaar cddadr cdddar cddddr 
+                   last list list* append copy-list copy-alist copy-tree revappend nconc nreconc butlast nbutlast
+                   ldiff rplaca rplacd subst subst-if subst-if-not nsubst nsubst-if nsubst-if-not sublis
+                   nsublis assoc assoc-if assoc-if-not rassoc rassoc-if rassoc-if-not 
+                   ))
+         t)
+        (t (canonical-type (or (expand-one-deftype type)
+                               (return-from canonical-type nil))))))
 
 
 (defun check-pvar-element-type (object element-type)
   (let ((type (if (consp element-type) (car element-type) element-type))
-	(rest (if (consp element-type) (cdr element-type) ()))
-	(pvar-type (pvar-type object)))
+        (rest (if (consp element-type) (cdr element-type) ()))
+        (pvar-type (pvar-type object)))
     (flet ((float-pvar-type (pvar rest mantissa exponent &optional (pvar-types '(:float :number-float)))
-	     (and (member (pvar-type pvar) pvar-types)
-		  (or (eql mantissa '*)
-		      (eql (pvar-mantissa-length pvar) mantissa))
-		  (or (eql exponent '*)
-		      (eql (pvar-exponent-length pvar) exponent))
-		  (or (null rest)
-		      (eql (car rest) '*))
-		  (or (null (cdr rest))
-		      (eql (cadr rest) '*))))
-	   (check-integer-range (rest low high)
-	     (and (or (null rest)
-		      (eql (car rest) '*)
-		      (if (consp (car rest))
-			  (eql (1+ (caar rest)) low)
-			  (eql (car rest) low)))
-		  (or (null (cdr rest))
-		      (eql (cadr rest) '*)
-		      (if (consp (cadr rest))
-			  (eql (1- (caadr rest)) high)
-			  (eql (cadr rest) high))))))
+             (and (member (pvar-type pvar) pvar-types)
+                  (or (eql mantissa '*)
+                      (eql (pvar-mantissa-length pvar) mantissa))
+                  (or (eql exponent '*)
+                      (eql (pvar-exponent-length pvar) exponent))
+                  (or (null rest)
+                      (eql (car rest) '*))
+                  (or (null (cdr rest))
+                      (eql (cadr rest) '*))))
+           (check-integer-range (rest low high)
+             (and (or (null rest)
+                      (eql (car rest) '*)
+                      (if (consp (car rest))
+                          (eql (1+ (caar rest)) low)
+                          (eql (car rest) low)))
+                  (or (null (cdr rest))
+                      (eql (cadr rest) '*)
+                      (if (consp (cadr rest))
+                          (eql (1- (caadr rest)) high)
+                          (eql (cadr rest) high))))))
       (case type
-	((t)
-	 (eql pvar-type :general))
-	(boolean
-	  (eql pvar-type :boolean))
-	(front-end
-	  (eql pvar-type :front-end))
-	(number
-	  ;; (pvar number),  number type does not specialize.
-	  (member pvar-type '(:field :signed :number-float :number-signed :float)))
-	(integer
-	 (case pvar-type
-	   (:field
-	     (check-integer-range rest 0 (1- (expt 2 (pvar-length object)))))
-	   (:signed
-	     (let ((expt (expt 2 (1- (pvar-length object)))))
-	       (check-integer-range rest (- expt) (1- expt))))
-	   ;; obsolete.
-	   (:number-signed
-	     t)
-	   (otherwise nil)))
-	(signed-byte
-	  (and (member pvar-type '(:signed :number-signed))
-	       (or (null rest)
-		   (eql (car rest) '*)
-		   (eql (pvar-length object) (car rest)))))
-	(unsigned-byte
-	  (and (eql pvar-type :field)
-	       (or (null rest)
-		   (eql (car rest) '*)
-		   (eql (pvar-length object) (car rest)))))
-	(mod
-	  (and (eql pvar-type :field)
-	       (or (null rest)
-		   (eql (car rest) '*)
-		   (eql (1- (expt 2 (pvar-length object))) (car rest)))))
-	(float
-	  (float-pvar-type object rest '* '*))
-	(short-float
-	  (float-pvar-type object rest short-float-mantissa short-float-exponent))
-	(single-float
-	  (float-pvar-type object rest single-float-mantissa single-float-exponent))
-	(double-float
-	  (float-pvar-type object rest double-float-mantissa double-float-exponent))
-	(long-float
-	  (float-pvar-type object rest long-float-mantissa long-float-exponent))
-	(defined-float
-	  (float-pvar-type object () (if (null rest) '* (car rest)) (if (null (cdr rest)) '* (cadr rest))))
-	((nil)
-	 nil)
-	;; Otherwise, I didn't understand the element-type, try again to see if it
-	;; is a user defined deftype.
-	(otherwise (check-pvar-element-type object (or (expand-pvar-element-type element-type)
-					       (return-from check-pvar-element-type nil))))))))
+        ((t)
+         (eql pvar-type :general))
+        (boolean
+          (eql pvar-type :boolean))
+        (front-end
+          (eql pvar-type :front-end))
+        (number
+          ;; (pvar number),  number type does not specialize.
+          (member pvar-type '(:field :signed :number-float :number-signed :float)))
+        (integer
+         (case pvar-type
+           (:field
+             (check-integer-range rest 0 (1- (expt 2 (pvar-length object)))))
+           (:signed
+             (let ((expt (expt 2 (1- (pvar-length object)))))
+               (check-integer-range rest (- expt) (1- expt))))
+           ;; obsolete.
+           (:number-signed
+             t)
+           (otherwise nil)))
+        (signed-byte
+          (and (member pvar-type '(:signed :number-signed))
+               (or (null rest)
+                   (eql (car rest) '*)
+                   (eql (pvar-length object) (car rest)))))
+        (unsigned-byte
+          (and (eql pvar-type :field)
+               (or (null rest)
+                   (eql (car rest) '*)
+                   (eql (pvar-length object) (car rest)))))
+        (mod
+          (and (eql pvar-type :field)
+               (or (null rest)
+                   (eql (car rest) '*)
+                   (eql (1- (expt 2 (pvar-length object))) (car rest)))))
+        (float
+          (float-pvar-type object rest '* '*))
+        (short-float
+          (float-pvar-type object rest short-float-mantissa short-float-exponent))
+        (single-float
+          (float-pvar-type object rest single-float-mantissa single-float-exponent))
+        (double-float
+          (float-pvar-type object rest double-float-mantissa double-float-exponent))
+        (long-float
+          (float-pvar-type object rest long-float-mantissa long-float-exponent))
+        (defined-float
+          (float-pvar-type object () (if (null rest) '* (car rest)) (if (null (cdr rest)) '* (cadr rest))))
+        ((nil)
+         nil)
+        ;; Otherwise, I didn't understand the element-type, try again to see if it
+        ;; is a user defined deftype.
+        (otherwise (check-pvar-element-type object (or (expand-pvar-element-type element-type)
+                                               (return-from check-pvar-element-type nil))))))))
 
 (defun pvarp (object &optional (element-type '*))
   (if (internal-pvarp object)
       (if (eql element-type '*)
-	  t
-	  (check-pvar-element-type object element-type))))
+          t
+          (check-pvar-element-type object element-type))))
 
 (defun boolean-pvarp (arg)
   (and (internal-pvarp arg)
@@ -736,19 +736,19 @@ pvar type of the proper type.
   (and (internal-pvarp arg)
        (eql (pvar-type arg) :signed)
        (or (eql length '*)
-	   (eql (pvar-length arg) length))))
+           (eql (pvar-length arg) length))))
 (defun unsigned-pvarp (arg &optional (length '*))
   (and (internal-pvarp arg)
        (eql (pvar-type arg) :field)
        (or (eql length '*)
-	   (eql (pvar-length arg) length))))
+           (eql (pvar-length arg) length))))
 (defun float-pvarp (arg &optional (mantissa '*) (exponent '*))
   (and (internal-pvarp arg)
        (eql (pvar-type arg) :float)
        (or (eql mantissa '*)
-	   (eql (pvar-mantissa-length arg) mantissa))
+           (eql (pvar-mantissa-length arg) mantissa))
        (or (eql exponent '*)
-	   (eql (pvar-exponent-length arg) exponent))))
+           (eql (pvar-exponent-length arg) exponent))))
 (defun single-float-pvarp (arg)
   (and (internal-pvarp arg)
        (eql (pvar-type arg) :float)
@@ -789,9 +789,9 @@ pvar type of the proper type.
   (and (internal-pvarp arg)
        (eql (pvar-type arg) :complex)
        (or (eql mantissa '*)
-	   (eql (pvar-mantissa-length arg) mantissa))
+           (eql (pvar-mantissa-length arg) mantissa))
        (or (eql exponent '*)
-	   (eql (pvar-exponent-length arg) exponent))))
+           (eql (pvar-exponent-length arg) exponent))))
 (defun single-complex-pvarp (arg)
   (and (internal-pvarp arg)
        (eql (pvar-type arg) :complex)
@@ -822,9 +822,9 @@ pvar type of the proper type.
   (and (internal-pvarp arg)
        (eql (pvar-type arg) :array)
        (or (eql element-type '*)
-	   (equal (cadr (portable-pvar-array-element-type arg)) element-type) )
+           (equal (cadr (portable-pvar-array-element-type arg)) element-type) )
        (or (eql dimensions '*)
-	   (array-pvarp-check-dimensions (portable-pvar-array-dimensions arg) dimensions))))
+           (array-pvarp-check-dimensions (portable-pvar-array-dimensions arg) dimensions))))
 
 (defun array-pvarp-check-dimensions (arg-array-dimensions array-dimensions)
   (do ((arg-array-dimensions arg-array-dimensions (cdr arg-array-dimensions))
@@ -848,13 +848,13 @@ pvar type of the proper type.
 (defun unsigned-pvarp-closure (length)
   #'(lambda (arg)
       (and (internal-pvarp arg)
-	   (eql (pvar-type arg) :field)
-	   (eql (pvar-length arg) length))))
+           (eql (pvar-type arg) :field)
+           (eql (pvar-length arg) length))))
 (defun signed-pvarp-closure (length)
   #'(lambda (arg)
       (and (internal-pvarp arg)
-	   (eql (pvar-type arg) :signed)
-	   (eql (pvar-length arg) length))))
+           (eql (pvar-type arg) :signed)
+           (eql (pvar-length arg) length))))
 
 
 (defun initialize-integer-pvarps (limit)
@@ -865,13 +865,13 @@ pvar type of the proper type.
   (let ((*print-case* :upcase))
     (dotimes (index limit)
       (setf (symbol-function
-	      (setf (aref unsigned-pvarps index)
-		    (intern (format nil "UNSIGNED~D-PVARP" index) *starlisp-internal-package-name*)))
-	    (unsigned-pvarp-closure index))
+              (setf (aref unsigned-pvarps index)
+                    (intern (format nil "UNSIGNED~D-PVARP" index) *starlisp-internal-package-name*)))
+            (unsigned-pvarp-closure index))
       (setf (symbol-function
-	      (setf (aref signed-pvarps index)
-		    (intern (format nil "SIGNED~D-PVARP" index) *starlisp-internal-package-name*)))
-	    (signed-pvarp-closure index)))))
+              (setf (aref signed-pvarps index)
+                    (intern (format nil "SIGNED~D-PVARP" index) *starlisp-internal-package-name*)))
+            (signed-pvarp-closure index)))))
 
 (initialize-integer-pvarps 129)
 
@@ -903,122 +903,122 @@ pvar type of the proper type.
 (defun pvar-type-predicate (element-type)
   (or (cdr (assoc element-type *pvar-type-predicates* :test #'equal))
       (case (if (consp element-type) (car element-type) element-type)
-	(* 'internal-pvarp)
-	(signed-byte
-	  (cond ((and (integerp (cadr element-type)) (>= (cadr element-type) 0) (< (cadr element-type) signed-pvarp-limit))
-		 (aref signed-pvarps (cadr element-type)))
-		((or #+lucid *dont-use-closure-for-pvar-types*
-		     (atom element-type) (eql (cadr element-type) '*))
-		 'signed-pvarp)
-		(t `(lambda (object) (signed-pvarp object ,(cadr element-type))))))
-	(unsigned-byte
-	  (cond ((and (integerp (cadr element-type)) (>= (cadr element-type) 0) (< (cadr element-type) unsigned-pvarp-limit))
-		 (aref unsigned-pvarps (cadr element-type)))
-		((or #+lucid *dont-use-closure-for-pvar-types*
-		     (atom element-type) (null (cdr element-type)) (eql (cadr element-type) '*))
-		 'unsigned-pvarp)
-		(t `(lambda (object) (unsigned-pvarp object ,(cadr element-type))))))
-	(boolean
-	  'boolean-pvarp)
-	(front-end
-	  'front-end-pvarp)
-	(character
-	  'character-pvarp)
-	(string-char
-	  'string-char-pvarp)
-	((t)
-	 'general-pvarp)
-	(single-float
-	  'single-float-pvarp)
-	(short-float
-	  'short-float-pvarp)
-	(double-float
-	  'double-float-pvarp)
-	(long-float
-	  'long-float-pvarp)
-	(extended-float
-	  'extended-float-pvarp)
-	(structure
-	  (cond ((or (null (cadr element-type)) (eq (cadr element-type) '*))
-		 'structure-pvarp)
-		((get (cadr element-type) '*defstruct-global-predicate-function))
-		#+lucid
-		(*dont-use-closure-for-pvar-types*
-		 'structure-pvarp)
-		(t `(lambda (object) (structure-pvarp object ',(cadr element-type))))))
-	(array
-	  (if (or #+lucid *dont-use-closure-for-pvar-types*
-		  (and (eq (cadr element-type) '*) (eq (caddr element-type) '*)))
-	      'array-pvarp
-	      `(lambda (object) (array-pvarp object ',(cadr element-type) ',(caddr element-type)))))
-	(defined-float
-	  (cond ((or (atom element-type)
-		     (and (or (null (cdr element-type)) (eql (cadr element-type) '*))
-			  (or (null (cddr element-type)) (eql (caddr element-type) '*))))
-		 'float-pvarp)
-		((and (eql (cadr element-type) short-float-mantissa) (eql (caddr element-type) short-float-exponent))
-		 'short-float-pvarp)
-		((and (eql (cadr element-type) single-float-mantissa) (eql (caddr element-type) single-float-exponent))
-		 'single-float-pvarp)
-		((and (eql (cadr element-type) double-float-mantissa) (eql (caddr element-type) double-float-exponent))
-		 'double-float-pvarp)
-		((and (eql (cadr element-type) long-float-mantissa) (eql (caddr element-type) long-float-exponent))
-		 'long-float-pvarp)
-		((and (eql (cadr element-type) extended-float-mantissa) (eql (caddr element-type) extended-float-exponent))
-		 'extended-float-pvarp)
-		#+lucid (*dont-use-closure-for-pvar-types* 'float-pvarp)
-		(t `(lambda (object)
-		      (float-pvarp object
-				   ,(if (eq (cadr element-type) '*) ''* (cadr element-type))
-				   ,(if (eq (caddr element-type) '*) ''* (caddr element-type)))))))
-	(complex
-	  (let ((element-type (cadr element-type)))
-	    (case (if (consp element-type) (car element-type) element-type)
-	      (single-float
-		'single-complex-pvarp)
-	      (short-float
-		'short-complex-pvarp)
-	      (double-float
-		'double-complex-pvarp)
-	      (long-float
-		'long-complex-pvarp)
-	      (extended-float
-		'extended-complex-pvarp)
-	      (defined-float
-		(cond ((or (atom element-type)
-			   (and (or (null (cdr element-type)) (eql (cadr element-type) '*))
-				(or (null (cddr element-type)) (eql (caddr element-type) '*))))
-		       'complex-pvarp)
-		      ((and (eql (cadr element-type) short-float-mantissa) (eql (caddr element-type) short-float-exponent))
-		       'short-complex-pvarp)
-		      ((and (eql (cadr element-type) single-float-mantissa) (eql (caddr element-type) single-float-exponent))
-		       'single-complex-pvarp)
-		      ((and (eql (cadr element-type) double-float-mantissa) (eql (caddr element-type) double-float-exponent))
-		       'double-complex-pvarp)
-		      ((and (eql (cadr element-type) long-float-mantissa) (eql (caddr element-type) long-float-exponent))
-		       'long-complex-pvarp)
-		      ((and (eql (cadr element-type) extended-float-mantissa) (eql (caddr element-type) extended-float-exponent))
-		       'extended-complex-pvarp)
-		      #+lucid (*dont-use-closure-for-pvar-types* 'complex-pvarp)
-		      (t `(lambda (object)
-			    (complex-pvarp object
-					   ,(if (eq (cadr element-type) '*) ''* (cadr element-type))
-					   ,(if (eq (caddr element-type) '*) ''* (caddr element-type)))))))
-	      (t nil))))
-	(otherwise
-	  #+lucid (if *dont-use-closure-for-pvar-types* 'pvarp `(lambda (object) (pvarp object ',element-type)))
-	  #-lucid `(lambda (object) (pvarp object ',element-type))))))
+        (* 'internal-pvarp)
+        (signed-byte
+          (cond ((and (integerp (cadr element-type)) (>= (cadr element-type) 0) (< (cadr element-type) signed-pvarp-limit))
+                 (aref signed-pvarps (cadr element-type)))
+                ((or #+lucid *dont-use-closure-for-pvar-types*
+                     (atom element-type) (eql (cadr element-type) '*))
+                 'signed-pvarp)
+                (t `(lambda (object) (signed-pvarp object ,(cadr element-type))))))
+        (unsigned-byte
+          (cond ((and (integerp (cadr element-type)) (>= (cadr element-type) 0) (< (cadr element-type) unsigned-pvarp-limit))
+                 (aref unsigned-pvarps (cadr element-type)))
+                ((or #+lucid *dont-use-closure-for-pvar-types*
+                     (atom element-type) (null (cdr element-type)) (eql (cadr element-type) '*))
+                 'unsigned-pvarp)
+                (t `(lambda (object) (unsigned-pvarp object ,(cadr element-type))))))
+        (boolean
+          'boolean-pvarp)
+        (front-end
+          'front-end-pvarp)
+        (character
+          'character-pvarp)
+        (string-char
+          'string-char-pvarp)
+        ((t)
+         'general-pvarp)
+        (single-float
+          'single-float-pvarp)
+        (short-float
+          'short-float-pvarp)
+        (double-float
+          'double-float-pvarp)
+        (long-float
+          'long-float-pvarp)
+        (extended-float
+          'extended-float-pvarp)
+        (structure
+          (cond ((or (null (cadr element-type)) (eq (cadr element-type) '*))
+                 'structure-pvarp)
+                ((get (cadr element-type) '*defstruct-global-predicate-function))
+                #+lucid
+                (*dont-use-closure-for-pvar-types*
+                 'structure-pvarp)
+                (t `(lambda (object) (structure-pvarp object ',(cadr element-type))))))
+        (array
+          (if (or #+lucid *dont-use-closure-for-pvar-types*
+                  (and (eq (cadr element-type) '*) (eq (caddr element-type) '*)))
+              'array-pvarp
+              `(lambda (object) (array-pvarp object ',(cadr element-type) ',(caddr element-type)))))
+        (defined-float
+          (cond ((or (atom element-type)
+                     (and (or (null (cdr element-type)) (eql (cadr element-type) '*))
+                          (or (null (cddr element-type)) (eql (caddr element-type) '*))))
+                 'float-pvarp)
+                ((and (eql (cadr element-type) short-float-mantissa) (eql (caddr element-type) short-float-exponent))
+                 'short-float-pvarp)
+                ((and (eql (cadr element-type) single-float-mantissa) (eql (caddr element-type) single-float-exponent))
+                 'single-float-pvarp)
+                ((and (eql (cadr element-type) double-float-mantissa) (eql (caddr element-type) double-float-exponent))
+                 'double-float-pvarp)
+                ((and (eql (cadr element-type) long-float-mantissa) (eql (caddr element-type) long-float-exponent))
+                 'long-float-pvarp)
+                ((and (eql (cadr element-type) extended-float-mantissa) (eql (caddr element-type) extended-float-exponent))
+                 'extended-float-pvarp)
+                #+lucid (*dont-use-closure-for-pvar-types* 'float-pvarp)
+                (t `(lambda (object)
+                      (float-pvarp object
+                                   ,(if (eq (cadr element-type) '*) ''* (cadr element-type))
+                                   ,(if (eq (caddr element-type) '*) ''* (caddr element-type)))))))
+        (complex
+          (let ((element-type (cadr element-type)))
+            (case (if (consp element-type) (car element-type) element-type)
+              (single-float
+                'single-complex-pvarp)
+              (short-float
+                'short-complex-pvarp)
+              (double-float
+                'double-complex-pvarp)
+              (long-float
+                'long-complex-pvarp)
+              (extended-float
+                'extended-complex-pvarp)
+              (defined-float
+                (cond ((or (atom element-type)
+                           (and (or (null (cdr element-type)) (eql (cadr element-type) '*))
+                                (or (null (cddr element-type)) (eql (caddr element-type) '*))))
+                       'complex-pvarp)
+                      ((and (eql (cadr element-type) short-float-mantissa) (eql (caddr element-type) short-float-exponent))
+                       'short-complex-pvarp)
+                      ((and (eql (cadr element-type) single-float-mantissa) (eql (caddr element-type) single-float-exponent))
+                       'single-complex-pvarp)
+                      ((and (eql (cadr element-type) double-float-mantissa) (eql (caddr element-type) double-float-exponent))
+                       'double-complex-pvarp)
+                      ((and (eql (cadr element-type) long-float-mantissa) (eql (caddr element-type) long-float-exponent))
+                       'long-complex-pvarp)
+                      ((and (eql (cadr element-type) extended-float-mantissa) (eql (caddr element-type) extended-float-exponent))
+                       'extended-complex-pvarp)
+                      #+lucid (*dont-use-closure-for-pvar-types* 'complex-pvarp)
+                      (t `(lambda (object)
+                            (complex-pvarp object
+                                           ,(if (eq (cadr element-type) '*) ''* (cadr element-type))
+                                           ,(if (eq (caddr element-type) '*) ''* (caddr element-type)))))))
+              (t nil))))
+        (otherwise
+          #+lucid (if *dont-use-closure-for-pvar-types* 'pvarp `(lambda (object) (pvarp object ',element-type)))
+          #-lucid `(lambda (object) (pvarp object ',element-type))))))
 
 
 
 (defun expand-pvar-element-type (element-type)
   #+lucid (declare (special lucid::*deftype-hashtable*))
   (let* ((type (if (consp element-type) (car element-type) element-type))
-	 (expander #+lucid (gethash type lucid::*deftype-hashtable*) #-lucid (get type 'deftype)))
+         (expander #+lucid (gethash type lucid::*deftype-hashtable*) #-lucid (get type 'deftype)))
     (if expander
-	#+lucid (funcall expander (if (consp element-type) element-type (list element-type)) nil) 
-	#-lucid (apply expander (if (consp element-type) (cdr element-type) ()))
-	nil)))
+        #+lucid (funcall expander (if (consp element-type) element-type (list element-type)) nil) 
+        #-lucid (apply expander (if (consp element-type) (cdr element-type) ()))
+        nil)))
   
 
 ;;;; **** WARNING.  DANGER, DANGER WILL ROBINSON.  WARNING ****
@@ -1028,128 +1028,128 @@ pvar type of the proper type.
 
 (defun canonical-pvar-type (pvar-type)
   (if (or (eql pvar-type 'pvar)
-	  (equal pvar-type '(pvar))
-	  (equal pvar-type '(pvar *)))
+          (equal pvar-type '(pvar))
+          (equal pvar-type '(pvar *)))
       '(pvar *)
       (if (not (and (consp pvar-type) (eql (car pvar-type) 'pvar)))
-	  (if pvar-type
-	      (canonical-pvar-type (expand-deftype pvar-type)))
-	  (let* ((element-type (cadr pvar-type))
-		 (first (if (consp element-type) (car element-type) element-type))
-		 (rest  (if (consp element-type) (cdr element-type) ())))
-	    (case first
-	      ((t)
-	       '(pvar t))
-	      (boolean
-		'(pvar boolean))
-	      (null
-		'(pvar boolean))
-	      (front-end
-		'(pvar front-end))
-	      (member
-		(if (or (equal element-type '(member nil t))
-			(equal element-type '(member t nil)))
-		    `(pvar boolean)
-		    nil))
-	      (number
-		'(pvar number))
-	      (integer
-		(let* ((low (cond ((null rest) '*)
-				  ((consp (car rest)) (1+ (caar rest)))
-				  (t (car rest))))
-		       (high (cond ((null (cdr rest)) '*)
-				   ((consp (cadr rest)) (1- (caadr rest)))
-				   (t (cadr rest)))))
-		  (cond ((eql low '*)
-			 '(pvar (signed-byte *)))
-			((>= low 0)
-			 (if (eql high '*)
-			     '(pvar (unsigned-byte *))
-			     `(pvar (unsigned-byte ,(max 1 (integer-length high))))))
-			(t (if (eql high '*)
-			       '(pvar (signed-byte *))
-			       `(pvar (signed-byte ,(max 2 (1+ (max (integer-length low) (integer-length high)))))))))))
-	      (unsigned-byte
-		(let ((length (if rest (macroexpand (car rest)) '*)))
-		  (if (and (not (integerp length)) (constantp length)) (setq length (eval length)))
-		  `(pvar (unsigned-byte ,length))))
-	      (signed-byte
-		(let ((length (if rest (macroexpand (car rest)) '*)))
-		  (if (and (not (integerp length)) (constantp length)) (setq length (eval length)))
-		  `(pvar (signed-byte ,length))))
-	      (fixnum
-		`(pvar (signed-byte ,(1+ (max (integer-length most-negative-fixnum) (integer-length most-positive-fixnum))))))
-	      (bit
-		`(pvar (unsigned-byte 1)))
-	      (mod
-		(if (or (null rest) (eql (car rest) '*))
-		    '(pvar (unsigned-byte *))
-		    `(pvar (unsigned-byte ,(max 1 (integer-length (1- (car rest))))))))
-	      (float
-		`(pvar (defined-float * *)))
-	      (short-float
-		`(pvar (defined-float #.short-float-mantissa #.short-float-exponent)))
-	      (single-float
-		`(pvar (defined-float #.single-float-mantissa #.single-float-exponent)))
-	      (double-float
-		`(pvar (defined-float #.double-float-mantissa #.double-float-exponent)))
-	      (long-float
-		`(pvar (defined-float #.long-float-mantissa #.long-float-exponent)))
-	      (defined-float
-		(let ((mantissa (if rest (car rest) '*)) (exponent (if (cdr rest) (cadr rest) '*)))
-		  (if (and (not (integerp mantissa)) (constantp mantissa)) (setq mantissa (eval mantissa)))
-		  (if (and (not (integerp exponent)) (constantp exponent)) (setq exponent (eval exponent)))
-		  `(pvar (defined-float ,mantissa ,exponent))))
-	      (complex
-		(let ((canonical-element-type (or (cadr (canonical-pvar-type `(pvar ,@rest))) '*)))
-		  (if (and (consp canonical-element-type)
-			   (member (car canonical-element-type) '(unsigned-byte signed-byte)))
-		      (setq canonical-element-type `(defined-float #.single-float-mantissa #.single-float-exponent)))
-		  `(pvar (complex ,(if (or (eq canonical-element-type 't) (eq canonical-element-type '*))
-				       '(defined-float * *)
-				       canonical-element-type)))))
-	      (string-char
-		`(pvar string-char))
-	      (standard-char
-		'(pvar string-char))
-	      (character
-		`(pvar character))
-	      ((array simple-array)
-		(let ((canonical-element-type (or (cadr (canonical-pvar-type `(pvar ,(car rest)))) '*)))
-		  `(pvar (array ,canonical-element-type
-				,(cond ((equal (cdr rest) '(())) '())
-				       ((integerp (cadr rest)) (make-list (cadr rest) :initial-element '*))
-				       ((or (null (cadr rest)) (eq (cadr rest) '*)) '*)
-				       ((constantp (cadr rest)) 
-					(let ((dimensions (eval (cadr rest))))
-					  (if (integerp dimensions)
-					      (make-list dimensions :initial-element '*)
-					      dimensions)))
-				       ((atom (cadr rest)) (cadr rest))
-				       (t (mapcar #'(lambda (dim) (if (constantp dim) (eval dim) dim)) (cadr rest))))))))
-	      (vector
-		(let ((canonical-element-type (or (cadr (canonical-pvar-type `(pvar ,(car rest)))) '*)))
-		  `(pvar (array ,canonical-element-type
-				(,(if (or (null (cadr rest)) (eq (cadr rest) '*))
-				      '* 
-				      (if (constantp (cadr rest)) (eval (cadr rest)) (cadr rest))))))))
-	      (simple-vector
-		(canonical-pvar-type `(pvar (vector t ,(or (cadr rest) '*)))))
-	      ((bit-vector simple-bit-vector)
-	       `(pvar (array (unsigned-byte 1) (,(or (if (constantp (car rest)) (eval (car rest)) (car rest)) '*)))))
-	      ((string simple-string)
-	       `(pvar (array string-char (,(or (if (constantp (car rest)) (eval (car rest)) (car rest)) '*)))))
-	      (structure
-		(let ((name (or (car rest) '*)))
-		  (unless (or (eq name '*) (and (symbolp name) (get name '*defstruct-structure)))
-		    (warn "~S is not a known structure type." name))
-		  `(pvar (structure ,name))))
-	      (ratio `(pvar (defined-float #.single-float-mantissa #.single-float-exponent)))
-	      (otherwise
-		(if (and (symbolp element-type) (get element-type '*defstruct-structure))
-		    `(pvar (structure ,element-type))
-		    (canonical-pvar-type `(pvar ,(or (expand-pvar-element-type element-type)
-						     (return-from canonical-pvar-type nil)))))))))))
+          (if pvar-type
+              (canonical-pvar-type (expand-deftype pvar-type)))
+          (let* ((element-type (cadr pvar-type))
+                 (first (if (consp element-type) (car element-type) element-type))
+                 (rest  (if (consp element-type) (cdr element-type) ())))
+            (case first
+              ((t)
+               '(pvar t))
+              (boolean
+                '(pvar boolean))
+              (null
+                '(pvar boolean))
+              (front-end
+                '(pvar front-end))
+              (member
+                (if (or (equal element-type '(member nil t))
+                        (equal element-type '(member t nil)))
+                    `(pvar boolean)
+                    nil))
+              (number
+                '(pvar number))
+              (integer
+                (let* ((low (cond ((null rest) '*)
+                                  ((consp (car rest)) (1+ (caar rest)))
+                                  (t (car rest))))
+                       (high (cond ((null (cdr rest)) '*)
+                                   ((consp (cadr rest)) (1- (caadr rest)))
+                                   (t (cadr rest)))))
+                  (cond ((eql low '*)
+                         '(pvar (signed-byte *)))
+                        ((>= low 0)
+                         (if (eql high '*)
+                             '(pvar (unsigned-byte *))
+                             `(pvar (unsigned-byte ,(max 1 (integer-length high))))))
+                        (t (if (eql high '*)
+                               '(pvar (signed-byte *))
+                               `(pvar (signed-byte ,(max 2 (1+ (max (integer-length low) (integer-length high)))))))))))
+              (unsigned-byte
+                (let ((length (if rest (macroexpand (car rest)) '*)))
+                  (if (and (not (integerp length)) (constantp length)) (setq length (eval length)))
+                  `(pvar (unsigned-byte ,length))))
+              (signed-byte
+                (let ((length (if rest (macroexpand (car rest)) '*)))
+                  (if (and (not (integerp length)) (constantp length)) (setq length (eval length)))
+                  `(pvar (signed-byte ,length))))
+              (fixnum
+                `(pvar (signed-byte ,(1+ (max (integer-length most-negative-fixnum) (integer-length most-positive-fixnum))))))
+              (bit
+                `(pvar (unsigned-byte 1)))
+              (mod
+                (if (or (null rest) (eql (car rest) '*))
+                    '(pvar (unsigned-byte *))
+                    `(pvar (unsigned-byte ,(max 1 (integer-length (1- (car rest))))))))
+              (float
+                `(pvar (defined-float * *)))
+              (short-float
+                `(pvar (defined-float #.short-float-mantissa #.short-float-exponent)))
+              (single-float
+                `(pvar (defined-float #.single-float-mantissa #.single-float-exponent)))
+              (double-float
+                `(pvar (defined-float #.double-float-mantissa #.double-float-exponent)))
+              (long-float
+                `(pvar (defined-float #.long-float-mantissa #.long-float-exponent)))
+              (defined-float
+                (let ((mantissa (if rest (car rest) '*)) (exponent (if (cdr rest) (cadr rest) '*)))
+                  (if (and (not (integerp mantissa)) (constantp mantissa)) (setq mantissa (eval mantissa)))
+                  (if (and (not (integerp exponent)) (constantp exponent)) (setq exponent (eval exponent)))
+                  `(pvar (defined-float ,mantissa ,exponent))))
+              (complex
+                (let ((canonical-element-type (or (cadr (canonical-pvar-type `(pvar ,@rest))) '*)))
+                  (if (and (consp canonical-element-type)
+                           (member (car canonical-element-type) '(unsigned-byte signed-byte)))
+                      (setq canonical-element-type `(defined-float #.single-float-mantissa #.single-float-exponent)))
+                  `(pvar (complex ,(if (or (eq canonical-element-type 't) (eq canonical-element-type '*))
+                                       '(defined-float * *)
+                                       canonical-element-type)))))
+              (string-char
+                `(pvar string-char))
+              (standard-char
+                '(pvar string-char))
+              (character
+                `(pvar character))
+              ((array simple-array)
+                (let ((canonical-element-type (or (cadr (canonical-pvar-type `(pvar ,(car rest)))) '*)))
+                  `(pvar (array ,canonical-element-type
+                                ,(cond ((equal (cdr rest) '(())) '())
+                                       ((integerp (cadr rest)) (make-list (cadr rest) :initial-element '*))
+                                       ((or (null (cadr rest)) (eq (cadr rest) '*)) '*)
+                                       ((constantp (cadr rest)) 
+                                        (let ((dimensions (eval (cadr rest))))
+                                          (if (integerp dimensions)
+                                              (make-list dimensions :initial-element '*)
+                                              dimensions)))
+                                       ((atom (cadr rest)) (cadr rest))
+                                       (t (mapcar #'(lambda (dim) (if (constantp dim) (eval dim) dim)) (cadr rest))))))))
+              (vector
+                (let ((canonical-element-type (or (cadr (canonical-pvar-type `(pvar ,(car rest)))) '*)))
+                  `(pvar (array ,canonical-element-type
+                                (,(if (or (null (cadr rest)) (eq (cadr rest) '*))
+                                      '* 
+                                      (if (constantp (cadr rest)) (eval (cadr rest)) (cadr rest))))))))
+              (simple-vector
+                (canonical-pvar-type `(pvar (vector t ,(or (cadr rest) '*)))))
+              ((bit-vector simple-bit-vector)
+               `(pvar (array (unsigned-byte 1) (,(or (if (constantp (car rest)) (eval (car rest)) (car rest)) '*)))))
+              ((string simple-string)
+               `(pvar (array string-char (,(or (if (constantp (car rest)) (eval (car rest)) (car rest)) '*)))))
+              (structure
+                (let ((name (or (car rest) '*)))
+                  (unless (or (eq name '*) (and (symbolp name) (get name '*defstruct-structure)))
+                    (warn "~S is not a known structure type." name))
+                  `(pvar (structure ,name))))
+              (ratio `(pvar (defined-float #.single-float-mantissa #.single-float-exponent)))
+              (otherwise
+                (if (and (symbolp element-type) (get element-type '*defstruct-structure))
+                    `(pvar (structure ,element-type))
+                    (canonical-pvar-type `(pvar ,(or (expand-pvar-element-type element-type)
+                                                     (return-from canonical-pvar-type nil)))))))))))
 
 (proclaim '(special nbits-per-lisp))
 
@@ -1157,78 +1157,78 @@ pvar type of the proper type.
   (declare (special *SIM::*char-code-length *SIM::*character-length))
   (if (and (consp type) (eql (car type) 'pvar))
       (let ((element (cadr type)))
-	(case (if (consp element) (car element) element)
-	  ((t)
-	   `*)
-	  (boolean
-	    1)
-	  (front-end
-	    (if eval nbits-per-lisp 'nbits-per-lisp))
-	  (number
-	    '*)
-	  ((unsigned-byte signed-byte)
-	   (or (cadr element) '*))
-	  (short-float
-	    '#.(+ 1 short-float-mantissa short-float-exponent))
-	  (single-float
-	    '#.(+ 1 single-float-mantissa single-float-exponent))
-	  (double-float
-	    '#.(+ 1 double-float-mantissa double-float-exponent))
-	  (long-float
-	    '#.(+ 1 long-float-mantissa long-float-exponent))
-	  (defined-float
-	    (cond ((and (consp element)
-			(integerp (cadr element))
-			(integerp (caddr element)))
-		   (+ 1 (cadr element) (caddr element)))
-		  ((and (consp element)
-			(cadr element) (caddr element)
-			(not (eq (cadr element) '*))
-			(not (eq (caddr element) '*)))
-		   `(+ 1 ,(cadr element) ,(caddr element)))
-		  (t '*)))
-	  (complex
-	   (let* ((element (cadr element))
-		  (length (cond ((and (consp element)
-				      (integerp (cadr element))
-				      (integerp (caddr element)))
-				 (+ 1 (cadr element) (caddr element)))
-				((and (consp element)
-				      (cadr element) (caddr element)
-				      (not (eq (cadr element) '*))
-				      (not (eq (caddr element) '*)))
-				 `(+ 1 ,(cadr element) ,(caddr element)))
-				(t '*))))
-	     (if (eq length '*)
-		 '*
-		 (if (integerp length)
-		     (* length 2)
-		     `(* ,length 2)))))
-	  (structure
-	    (if (equal type '(pvar (structure *)))
-		'*
-		(funcall 'structure-pvar-type-total-length-in-bits type)))
-	  (array (length-pvar-type-for-array type eval))
-	  (string-char (if eval *SIM::*char-code-length '*SIM::*char-code-length))
-	  (character (if eval *SIM::*character-length '*SIM::*character-length))
-	  (otherwise (length-pvar-type `(pvar ,(or (expand-pvar-element-type element)
-					   (return-from length-pvar-type '*)))))))
+        (case (if (consp element) (car element) element)
+          ((t)
+           `*)
+          (boolean
+            1)
+          (front-end
+            (if eval nbits-per-lisp 'nbits-per-lisp))
+          (number
+            '*)
+          ((unsigned-byte signed-byte)
+           (or (cadr element) '*))
+          (short-float
+            '#.(+ 1 short-float-mantissa short-float-exponent))
+          (single-float
+            '#.(+ 1 single-float-mantissa single-float-exponent))
+          (double-float
+            '#.(+ 1 double-float-mantissa double-float-exponent))
+          (long-float
+            '#.(+ 1 long-float-mantissa long-float-exponent))
+          (defined-float
+            (cond ((and (consp element)
+                        (integerp (cadr element))
+                        (integerp (caddr element)))
+                   (+ 1 (cadr element) (caddr element)))
+                  ((and (consp element)
+                        (cadr element) (caddr element)
+                        (not (eq (cadr element) '*))
+                        (not (eq (caddr element) '*)))
+                   `(+ 1 ,(cadr element) ,(caddr element)))
+                  (t '*)))
+          (complex
+           (let* ((element (cadr element))
+                  (length (cond ((and (consp element)
+                                      (integerp (cadr element))
+                                      (integerp (caddr element)))
+                                 (+ 1 (cadr element) (caddr element)))
+                                ((and (consp element)
+                                      (cadr element) (caddr element)
+                                      (not (eq (cadr element) '*))
+                                      (not (eq (caddr element) '*)))
+                                 `(+ 1 ,(cadr element) ,(caddr element)))
+                                (t '*))))
+             (if (eq length '*)
+                 '*
+                 (if (integerp length)
+                     (* length 2)
+                     `(* ,length 2)))))
+          (structure
+            (if (equal type '(pvar (structure *)))
+                '*
+                (funcall 'structure-pvar-type-total-length-in-bits type)))
+          (array (length-pvar-type-for-array type eval))
+          (string-char (if eval *SIM::*char-code-length '*SIM::*char-code-length))
+          (character (if eval *SIM::*character-length '*SIM::*character-length))
+          (otherwise (length-pvar-type `(pvar ,(or (expand-pvar-element-type element)
+                                           (return-from length-pvar-type '*)))))))
       (if type
-	  (length-pvar-type (canonical-pvar-type type)))))
+          (length-pvar-type (canonical-pvar-type type)))))
 
 (defun length-pvar-type-for-array (type &optional (eval t))
   (let ((array-element-type-length (length-pvar-type `(pvar ,(array-pvar-type-element-type type)) eval))
-	(array-dimensions (array-pvar-type-dimensions type)))
+        (array-dimensions (array-pvar-type-dimensions type)))
     (cond ((eq '* array-element-type-length) '*)
-	  ((numberp array-dimensions) '*)
-	  ((eq array-dimensions '*) '*)
-	  ((atom array-dimensions)
-	   (if (and (null array-dimensions) (cddadr type))
-	       array-element-type-length
-	       `(* ,array-element-type-length (apply '* ,array-dimensions))))
-	  ((find '* array-dimensions) '*)
-	  (t
-	   (values (apply 'simplify-expression '* array-element-type-length array-dimensions))))))
+          ((numberp array-dimensions) '*)
+          ((eq array-dimensions '*) '*)
+          ((atom array-dimensions)
+           (if (and (null array-dimensions) (cddadr type))
+               array-element-type-length
+               `(* ,array-element-type-length (apply '* ,array-dimensions))))
+          ((find '* array-dimensions) '*)
+          (t
+           (values (apply 'simplify-expression '* array-element-type-length array-dimensions))))))
 
 ;;This will return one of boolean, unsigned-byte, signed-byte, defined-float,
 ;; complex, string-char, character, array, structure, t, front-end, or *.
@@ -1343,11 +1343,11 @@ pvar type of the proper type.
      `(pvar (,pvar-element-type ,(or length '*))))
     (defined-float
       (unless (and (null length) (null dimensions) (null element-type) (null name))
-	(error "Invalid keyword argument." ))
+        (error "Invalid keyword argument." ))
       `(pvar (defined-float ,(or mantissa '*) ,(or exponent '*))))
     (complex
       (unless (and (null length) (null dimensions) (null element-type) (null name))
-	(error "Invalid keyword argument." ))
+        (error "Invalid keyword argument." ))
       `(pvar (complex (defined-float ,(or mantissa '*) ,(or exponent '*)))))
     ((array simple-array)
      (unless (and (null length) (null mantissa) (null exponent) (null name))
@@ -1355,7 +1355,7 @@ pvar type of the proper type.
      `(pvar (array ,(or element-type '*) ,(if dimp dimensions '*))))
     (structure
       (unless (and (null length) (null mantissa) (null exponent) (null dimensions) (null element-type))
-	(error "Invalid keyword argument." ))
+        (error "Invalid keyword argument." ))
       `(pvar (structure ,(or name '*))))
     (otherwise (error "Invalid pvar element-type ~S." element-type))))
 
@@ -1365,49 +1365,49 @@ pvar type of the proper type.
     ((eval-not* (x) (if (eq x '*) '* (eval x))))
     (let ((cpet (canonical-pvar-element-type cpt)))
       (case cpet
-	(boolean cpt)
-	(front-end cpt)
-	((unsigned-byte signed-byte)
-	  (let ((length (cadr (cadr cpt))))
-	    (make-canonical-pvar-type cpet :length (eval-not* length))
-	    ))
-	(defined-float
-	  (let ((mantissa (cadr (cadr cpt)))
-		(exponent (caddr (cadr cpt))))
-	    (if (and (or (integerp mantissa) (eq mantissa '*))
-		     (or (integerp exponent) (eq exponent '*)))
-		cpt
-		(make-canonical-pvar-type cpet :mantissa (eval-not* mantissa) :exponent (eval-not* exponent))
-		)))
-	(complex
-	  (let ((mantissa (cadr (cadadr cpt)))
-		(exponent (caddr (cadadr cpt))))
-	    (if (and (or (integerp mantissa) (eq mantissa '*))
-		     (or (integerp exponent) (eq exponent '*)))
-		cpt
-		(make-canonical-pvar-type cpet :mantissa (eval-not* mantissa) :exponent (eval-not* exponent))
-		)))
-	(structure cpt)
-	(string-char cpt)
-	(character cpt)
-	(array
-	  (let ((dimensions (array-pvar-type-dimensions cpt))
-		(element-type (array-pvar-type-element-type cpt)))
-	    (setq dimensions
-		  (cond
-		    ((symbolp dimensions) (eval dimensions))
-		    ((listp dimensions) (mapcar #'eval-not* dimensions))
-		    ))
-	    (make-canonical-pvar-type
-	      'array
-	      :dimensions dimensions
-	      :element-type
-	      (cadr (non-lexical-canonical-pvar-type-with-numeric-lengths-from-canonical-pvar-type `(pvar ,element-type)))
-	      )))
-	((t) cpt)
-	(* cpt)
-	(otherwise (error "Unknown pvar type ~S, probably internal error." cpt))
-	))))
+        (boolean cpt)
+        (front-end cpt)
+        ((unsigned-byte signed-byte)
+          (let ((length (cadr (cadr cpt))))
+            (make-canonical-pvar-type cpet :length (eval-not* length))
+            ))
+        (defined-float
+          (let ((mantissa (cadr (cadr cpt)))
+                (exponent (caddr (cadr cpt))))
+            (if (and (or (integerp mantissa) (eq mantissa '*))
+                     (or (integerp exponent) (eq exponent '*)))
+                cpt
+                (make-canonical-pvar-type cpet :mantissa (eval-not* mantissa) :exponent (eval-not* exponent))
+                )))
+        (complex
+          (let ((mantissa (cadr (cadadr cpt)))
+                (exponent (caddr (cadadr cpt))))
+            (if (and (or (integerp mantissa) (eq mantissa '*))
+                     (or (integerp exponent) (eq exponent '*)))
+                cpt
+                (make-canonical-pvar-type cpet :mantissa (eval-not* mantissa) :exponent (eval-not* exponent))
+                )))
+        (structure cpt)
+        (string-char cpt)
+        (character cpt)
+        (array
+          (let ((dimensions (array-pvar-type-dimensions cpt))
+                (element-type (array-pvar-type-element-type cpt)))
+            (setq dimensions
+                  (cond
+                    ((symbolp dimensions) (eval dimensions))
+                    ((listp dimensions) (mapcar #'eval-not* dimensions))
+                    ))
+            (make-canonical-pvar-type
+              'array
+              :dimensions dimensions
+              :element-type
+              (cadr (non-lexical-canonical-pvar-type-with-numeric-lengths-from-canonical-pvar-type `(pvar ,element-type)))
+              )))
+        ((t) cpt)
+        (* cpt)
+        (otherwise (error "Unknown pvar type ~S, probably internal error." cpt))
+        ))))
 
 
 (DEFMACRO PROCLAIM-*DEFUN (FUNCTION-NAME)
@@ -1722,40 +1722,40 @@ pvar type of the proper type.
       ((null data-type-arguments) '(pvar (signed-byte *)))
       (t
        (let ((low (first data-type-arguments)) (high (second data-type-arguments)))
-	 (setq low
-	       (cond
-		 ((or (integerp low) (eq low '*)) low)
-		 ((listp low)
-		  (if (or (not (eql 1 (length low))) (not (integerp (car low))))
-		      (syntax-error "The first argument must be a one element list containing an integer")
-		      (1+ (car low))
-		      ))
-		 (t (syntax-error "Starlisp cannot handle arguments to the INTEGER type which are not integers"))
-		 ))
-	 (setq high
-	       (cond
-		 ((and (null high) (eql 1 (length data-type-arguments))) '*)
-		 ((or (integerp high) (eq high '*)) high)
-		 ((listp high)
-		  (if (or (not (eql 1 (length high))) (not (integerp (car high))))
-		      (syntax-error "The second argument must be a one element list containing an integer")
-		      (1- (car high))
-		      ))
-		 (t (syntax-error "Starlisp cannot handle arguments to the INTEGER type which are not integers"))
-		 ))
-	 (when (and (integerp low) (integerp high) (< high low))
-	   (syntax-error "The minimum of the range specified is greater than the maximum!"))
-	 (cond ((eql low '*)
-		'(pvar (signed-byte *)))
-	       ((>= low 0)
-		(if (eql high '*)
-		    '(pvar (unsigned-byte *))
-		    `(pvar (unsigned-byte ,(max 1 (integer-length high))))))
-	       (t
-		(if (eql high '*)
-		    '(pvar (signed-byte *))
-		    `(pvar (signed-byte ,(max 2 (1+ (max (integer-length low) (integer-length high))))))
-		    ))))))))
+         (setq low
+               (cond
+                 ((or (integerp low) (eq low '*)) low)
+                 ((listp low)
+                  (if (or (not (eql 1 (length low))) (not (integerp (car low))))
+                      (syntax-error "The first argument must be a one element list containing an integer")
+                      (1+ (car low))
+                      ))
+                 (t (syntax-error "Starlisp cannot handle arguments to the INTEGER type which are not integers"))
+                 ))
+         (setq high
+               (cond
+                 ((and (null high) (eql 1 (length data-type-arguments))) '*)
+                 ((or (integerp high) (eq high '*)) high)
+                 ((listp high)
+                  (if (or (not (eql 1 (length high))) (not (integerp (car high))))
+                      (syntax-error "The second argument must be a one element list containing an integer")
+                      (1- (car high))
+                      ))
+                 (t (syntax-error "Starlisp cannot handle arguments to the INTEGER type which are not integers"))
+                 ))
+         (when (and (integerp low) (integerp high) (< high low))
+           (syntax-error "The minimum of the range specified is greater than the maximum!"))
+         (cond ((eql low '*)
+                '(pvar (signed-byte *)))
+               ((>= low 0)
+                (if (eql high '*)
+                    '(pvar (unsigned-byte *))
+                    `(pvar (unsigned-byte ,(max 1 (integer-length high))))))
+               (t
+                (if (eql high '*)
+                    '(pvar (signed-byte *))
+                    `(pvar (signed-byte ,(max 2 (1+ (max (integer-length low) (integer-length high))))))
+                    ))))))))
 
 
 
@@ -1764,119 +1764,119 @@ pvar type of the proper type.
     ((syntax-error (reason) `(pvar-type-syntax-error pvar-type ,reason error)))
     (labels
       ((evaluatable-expression-p (expression)
-	 (and expression (or (symbolp expression) (listp expression)))
-	 )
+         (and expression (or (symbolp expression) (listp expression)))
+         )
        (valid-form-p (expression predicate)
-	 (or (funcall predicate expression) (evaluatable-expression-p expression))
-	 ))
+         (or (funcall predicate expression) (evaluatable-expression-p expression))
+         ))
       (when (and (listp (car data-type-arguments))
-		 (integerp (car (car data-type-arguments)))
-		 )
-	(syntax-error
-	  "The array element type is a list beginning with a number.  Perhaps you reversed the element type and dimensions"
-	  ))
+                 (integerp (car (car data-type-arguments)))
+                 )
+        (syntax-error
+          "The array element type is a list beginning with a number.  Perhaps you reversed the element type and dimensions"
+          ))
       (if (null data-type-arguments)
-	  `(pvar (array * *))
-	  (let ((canonical-element-type (cadr (valid-pvar-type-p `(pvar ,(car data-type-arguments)) error))))
-	    (cond
-;	      ((and (eq '* (length-pvar-type `(pvar ,canonical-element-type))) (not (eq '* canonical-element-type)))
-;	       (syntax-error "Starlisp does not currently allow arrays of varying length pvars.  Sorry"))
-	      ((null canonical-element-type)
-	       (syntax-error "The element type is not a recognized legal element pvar type"))
-	      (t
-	       (if (eql 1 (length data-type-arguments))
-		   `(pvar (array ,canonical-element-type *))
-		   (let ((dimensions (second data-type-arguments)))
-		     (cond
-		       ((and (integerp dimensions) (not (minusp dimensions)))
-			(if *warn-about-integer-dimension*
-			    (warn "I'll bet you meant ~S, a 1-dimensional array ~D long,~%~@
+          `(pvar (array * *))
+          (let ((canonical-element-type (cadr (valid-pvar-type-p `(pvar ,(car data-type-arguments)) error))))
+            (cond
+;             ((and (eq '* (length-pvar-type `(pvar ,canonical-element-type))) (not (eq '* canonical-element-type)))
+;              (syntax-error "Starlisp does not currently allow arrays of varying length pvars.  Sorry"))
+              ((null canonical-element-type)
+               (syntax-error "The element type is not a recognized legal element pvar type"))
+              (t
+               (if (eql 1 (length data-type-arguments))
+                   `(pvar (array ,canonical-element-type *))
+                   (let ((dimensions (second data-type-arguments)))
+                     (cond
+                       ((and (integerp dimensions) (not (minusp dimensions)))
+                        (if *warn-about-integer-dimension*
+                            (warn "I'll bet you meant ~S, a 1-dimensional array ~D long,~%~@
                                    instead of ~S, a ~D dimensional array of indeterminate size.~%~@
                                    To turn off this warning do ~%~@
                                    (setq ~S::*warn-about-integer-dimension* nil)."
-				  `(pvar (array ,canonical-element-type (,dimensions)))
-				  dimensions
-				  `(pvar (array ,canonical-element-type ,dimensions))
-				  dimensions
-				  *starlisp-internal-package-name*
-				  ))
-			(when (minusp dimensions)
-			  (syntax-error "A negative number of dimensions makes no sense."))
-			`(pvar (array ,canonical-element-type ,(make-list dimensions :initial-element '*)))
-			)
-		       ((symbolp dimensions)
-			`(pvar (array ,canonical-element-type ,dimensions)))
-		       ((listp dimensions)
-			(when (eq (car dimensions) 'quote)
-			  (syntax-error "The dimensions list should not be quoted.")
-			  )
-			(if (every #'(lambda (x) (valid-form-p x #'(lambda (y) (and (integerp y) (not (minusp y))))))
-				   dimensions
-				   )
-			    (progn
-			      (when (every #'integerp dimensions)
-				(when (>= (apply #'* dimensions) *array-total-size-limit)
-				  (warn "You are declaring an array of size ~D elements or greater.  This is non-portable."
-					*array-total-size-limit
-					))
-				(when (>= (length dimensions) *array-rank-limit)
-				  (when *warn-about-array-rank*
-				    (warn "You are declaring an array of rank ~D or greater.~%~@
+                                  `(pvar (array ,canonical-element-type (,dimensions)))
+                                  dimensions
+                                  `(pvar (array ,canonical-element-type ,dimensions))
+                                  dimensions
+                                  *starlisp-internal-package-name*
+                                  ))
+                        (when (minusp dimensions)
+                          (syntax-error "A negative number of dimensions makes no sense."))
+                        `(pvar (array ,canonical-element-type ,(make-list dimensions :initial-element '*)))
+                        )
+                       ((symbolp dimensions)
+                        `(pvar (array ,canonical-element-type ,dimensions)))
+                       ((listp dimensions)
+                        (when (eq (car dimensions) 'quote)
+                          (syntax-error "The dimensions list should not be quoted.")
+                          )
+                        (if (every #'(lambda (x) (valid-form-p x #'(lambda (y) (and (integerp y) (not (minusp y))))))
+                                   dimensions
+                                   )
+                            (progn
+                              (when (every #'integerp dimensions)
+                                (when (>= (apply #'* dimensions) *array-total-size-limit)
+                                  (warn "You are declaring an array of size ~D elements or greater.  This is non-portable."
+                                        *array-total-size-limit
+                                        ))
+                                (when (>= (length dimensions) *array-rank-limit)
+                                  (when *warn-about-array-rank*
+                                    (warn "You are declaring an array of rank ~D or greater.~%~@
                                            Common Lisp only portably allows arrays of rank 7 or less.~%~@
                                            You will not be able to read your arrays out of the CM in a ~%~@
                                            straightforward manner.  To turn off this warning do ~%~@
                                            (setq ~S::*warn-about-array-rank* nil)"
-					  *array-rank-limit *starlisp-internal-package-name*
-					  ))))
-			      (when (some #'(lambda (x) (and (integerp x) (>= x *array-dimension-limit))) dimensions)
-				(warn "You are declaring an array which has a dimension of size ~D elements or greater.  This
+                                          *array-rank-limit *starlisp-internal-package-name*
+                                          ))))
+                              (when (some #'(lambda (x) (and (integerp x) (>= x *array-dimension-limit))) dimensions)
+                                (warn "You are declaring an array which has a dimension of size ~D elements or greater.  This
 is non-portable."
-				      *array-dimension-limit
-				      ))
-			      `(pvar (array ,canonical-element-type ,dimensions))
-			      )
-			      (syntax-error
-				"Every component of the dimensions list will not evaluate to a non-negative integer")))
-			(t (syntax-error
-			     "The dimensions argument is unrecognizable as a potential list of non-negative integers"))
-			))))
-	       ))))))
+                                      *array-dimension-limit
+                                      ))
+                              `(pvar (array ,canonical-element-type ,dimensions))
+                              )
+                              (syntax-error
+                                "Every component of the dimensions list will not evaluate to a non-negative integer")))
+                        (t (syntax-error
+                             "The dimensions argument is unrecognizable as a potential list of non-negative integers"))
+                        ))))
+               ))))))
 
 
 (defun vector-valid-pvar-type-p (pvar-type data-type-arguments error)
   (macrolet
     ((syntax-error (reason) `(pvar-type-syntax-error pvar-type ,reason error)))
     (if (null data-type-arguments)
-	'(pvar (array * (*)))
-	(let ((canonical-element-type (cadr (canonical-pvar-type `(pvar ,(car data-type-arguments))))))
-	  (cond
-	    ((and (eq '* (length-pvar-type `(pvar ,canonical-element-type))) (not (eq '* canonical-element-type)))
-	     (syntax-error "Starlisp does not currently allow arrays of varying length pvars.  Sorry"))
-	    ((null canonical-element-type)
-	     (syntax-error "The element type is not a recognized legal element pvar type"))
-	    (t
-	     (if (eql 1 (length data-type-arguments))
-		 `(pvar (array ,canonical-element-type (*)))
-		 (let ((length (second data-type-arguments)))
-		   (cond
-		     ((integerp length) 
-		      (when (minusp length)
-			(syntax-error "A negative length makes no sense."))
-		      (when (>= length *array-dimension-limit)
-			(warn "You are declaring a vector which has a length of ~D elements or greater.  This is non-portable"
-			      *array-dimension-limit
-			      ))
-		      `(pvar (array ,canonical-element-type (,length)))
-		      )
-		     ((and length (symbolp length))
-		      `(pvar (array ,canonical-element-type (,length))))
-		     ((and length (listp length))
-		      (if (integerp (car length))
-			  (syntax-error "The length argument must be a single integer, not a list of integers")
-			  `(pvar (array ,canonical-element-type (,length)))
-			  ))
-		     (t (syntax-error "The length argument is unrecognizable as a possible non-negative integer"))
-		     )))))))))
+        '(pvar (array * (*)))
+        (let ((canonical-element-type (cadr (canonical-pvar-type `(pvar ,(car data-type-arguments))))))
+          (cond
+            ((and (eq '* (length-pvar-type `(pvar ,canonical-element-type))) (not (eq '* canonical-element-type)))
+             (syntax-error "Starlisp does not currently allow arrays of varying length pvars.  Sorry"))
+            ((null canonical-element-type)
+             (syntax-error "The element type is not a recognized legal element pvar type"))
+            (t
+             (if (eql 1 (length data-type-arguments))
+                 `(pvar (array ,canonical-element-type (*)))
+                 (let ((length (second data-type-arguments)))
+                   (cond
+                     ((integerp length) 
+                      (when (minusp length)
+                        (syntax-error "A negative length makes no sense."))
+                      (when (>= length *array-dimension-limit)
+                        (warn "You are declaring a vector which has a length of ~D elements or greater.  This is non-portable"
+                              *array-dimension-limit
+                              ))
+                      `(pvar (array ,canonical-element-type (,length)))
+                      )
+                     ((and length (symbolp length))
+                      `(pvar (array ,canonical-element-type (,length))))
+                     ((and length (listp length))
+                      (if (integerp (car length))
+                          (syntax-error "The length argument must be a single integer, not a list of integers")
+                          `(pvar (array ,canonical-element-type (,length)))
+                          ))
+                     (t (syntax-error "The length argument is unrecognizable as a possible non-negative integer"))
+                     )))))))))
 
 
 (deftype defined-float (&optional mantissa exponent)
@@ -1885,6 +1885,12 @@ is non-portable."
 
 #+symbolics
 (si:allow-redefinition 'pvar 'deftype)
+#|(deftype pvar (&optional (element-type '*))
+  ;; I have to return a satisfies type with a closure so that typep can work.
+  ;; But, returning a closure will blow up both subtypep and the compiler on lucid.
+  (let ((closure (pvar-type-predicate (cadr (canonical-pvar-type `(pvar ,element-type))))))
+    `(satisfies ,closure)))|#
+
 (deftype pvar (&optional (element-type '*))
   ;; I have to return a satisfies type with a closure so that typep can work.
   ;; But, returning a closure will blow up both subtypep and the compiler on lucid.

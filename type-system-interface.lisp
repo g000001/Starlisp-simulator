@@ -164,7 +164,7 @@ pvar type of the proper type.
   `(eval-when (:compile-toplevel :load-toplevel :execute)
      (starlisp-proclaim ,decl-spec)))
 
-(defun *lisp::proclaim (proclamation)
+(defun *sim::proclaim (proclamation)
   (starlisp-proclaim proclamation)
   )
 
@@ -173,7 +173,7 @@ pvar type of the proper type.
      ,@(mapcar #'(lambda (ds) `(starlisp-proclaim ',ds)) decl-specs)
      ))
 
-(defmacro *lisp::declaim (&rest decl-specs) `(*declaim ,@decl-specs))
+(defmacro *sim::declaim (&rest decl-specs) `(*declaim ,@decl-specs))
 
 (defun unproclaim (decl-spec)
   (starlisp-unproclaim decl-spec))
@@ -183,7 +183,7 @@ pvar type of the proper type.
 ;;; This is so that we can capture deftype information for starlisp-proclaim to do type expansion.
 ;;;
 
-(defmacro *lisp::deftype (name lambda-list &rest body)
+(defmacro *sim::deftype (name lambda-list &rest body)
   `(progn
      (setf (get ',name :*lisp-deftype)
        #'(lambda (&rest form)

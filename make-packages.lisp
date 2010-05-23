@@ -42,13 +42,12 @@
   (:nicknames "*LISP-I")
   )
 
-(defpackage-with-lists-symbols 
-    "*SIM"
-    (:shadow-list-symbol *common-lisp-shadowed-symbol-names*)
-  (:use "COMMON-LISP")
-  (:nicknames "*LISP")
-  )
-
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defpackage-with-lists-symbols 
+      "*SIM"
+      (:shadow-list-symbol *common-lisp-shadowed-symbol-names*)
+    (:use "COMMON-LISP")
+    (:nicknames "*LISP")  )
 
 (defpackage-with-lists-symbols 
     "*SIM-COMPILER"
@@ -72,6 +71,7 @@
   (:use "*SIM" "COMMON-LISP")
   (:nicknames "*USER" "*LISP-USER")
   )
+)
 
 (defparameter *lisp-i::*starlisp-package-name* :*SIM)
 (defparameter *lisp-i::*starlisp-internal-package-name* :*SIM-I)
