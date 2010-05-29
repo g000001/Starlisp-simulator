@@ -328,7 +328,8 @@
   nil
  )
 
-
+#+SBCL
+(DECLAIM (FTYPE (FUNCTION (T T T T)) CHECK-INITIALIZATION-ARGUMENTS))
 (defun check-initialization-arguments (name-of-form form variable fname)
   (assert (and (or (symbolp name-of-form) (stringp name-of-form)) name-of-form) (name-of-form)
 	  "~S: The name-of-form argument (~S) is not a string" fname name-of-form)
@@ -368,7 +369,7 @@
 
 (defun delete-initialization (name-of-form variable)
   (multiple-value-bind (name-of-form form variable)
-      (check-initialization-arguments name-of-form 0 variable 'delete-initialization)
+      (check-initialization-arguments name-of-form () variable 'delete-initialization)
     #-SYMBOLICS
     (declare (ignore form))
     #+SYMBOLICS
@@ -379,7 +380,10 @@
 		 (existing-form (assoc name-of-form forms-list :test #'equal))
 		)
 	    (if existing-form
-		(set variable (delete existing-form forms-list :test #'equal))
+                (PROGN
+                  (setq existing-form 
+                        (delete existing-form forms-list :test #'equal))
+                  (set variable existing-form))
 		(format t "An initialization named ~S is not present for list ~S"
 			  name-of-form v)
 	     )))
