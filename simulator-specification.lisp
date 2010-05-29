@@ -58,7 +58,7 @@
 ;;           It destroys nicknames and use lists unless provided again.
 ;; Screw it for now.
 
-#-(OR :CORMANLISP :CLISP :clozure)
+#-(OR :CORMANLISP :CLISP :clozure :SBCL)
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (cl-user::defpackage-with-lists-symbols "*SIM"
       (:import-from-package "*SIM-I"
