@@ -98,13 +98,15 @@
 	     ',(mapcar #'(lambda (slot) (slot-accessor-function-name ds slot)) (*defstruct-all-slots-list ds)))
        (setf (get ',name '*defstruct-front-end-slot-accessors)
 	     ',(mapcar #'(lambda (slot) (front-end-accessor-name ds slot)) (*defstruct-all-slots-list ds)))
+       #-SBCL
+       (PROGN
        ,@(mapcar #'(lambda (slot)
 		     `(*proclaim '(ftype (function (,name) ,(*defstruct-slot-type slot))
 					 ,(front-end-accessor-name ds slot))))
 		 (*defstruct-all-slots-list ds))
        (*proclaim '(ftype (function (&rest t) ,name) ,(*defstruct-constructor-name ds)))
        (*proclaim '(ftype (function (&rest t) ,name) ,(*defstruct-copier-name ds)))
-       (*proclaim '(ftype (function (t) boolean) ,(*defstruct-predicate-name ds)))
+       (*proclaim '(ftype (function (t) boolean) ,(*defstruct-predicate-name ds))))
        (deftype ,(modify-name name "" "-PVAR") () `(pvar ,',name)))))
 
 
