@@ -207,8 +207,7 @@
          (when ordering
            (argument-error-test
             (eq mode :grid)
-            "You specified a dimensions ordering, but you also specified or defaulted to :CUBE mode"
-            ))
+            "You specified a dimensions ordering, but you also specified or defaulted to :CUBE mode"))
          
          (let ((default-ordering nil))
            (dotimes (j *number-of-dimensions*) (push j default-ordering))
@@ -356,8 +355,7 @@
             (setq end *number-of-processors-limit*)
             )
            (t (setq error-string
-                    (format nil "You specified :CUBE mode but :START, ~S, and :END, ~S, were both lists") start end
-                  ))))
+                    (format nil "You specified :CUBE mode but :START, ~S, and :END, ~S, were both lists" start end)))))
          (t (error "This is impossible"))
          ))))
      
