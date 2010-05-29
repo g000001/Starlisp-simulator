@@ -753,7 +753,7 @@
 	(*pvar* pvar)
 	(format-string (format nil "~~~DS " width))
 	)
-    (declare (special *print-array* *pvar*))
+    (declare (special *pvar*))
 
     (*with-vp-set (pvar-vp-set pvar)
 
