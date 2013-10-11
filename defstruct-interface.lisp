@@ -3,7 +3,7 @@
 (in-package :*sim-i)
 
 ;;;> *+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+
-;;;> 
+;;;>
 ;;;> The Thinking Machines *Lisp Simulator is in the public domain.
 ;;;> You are free to do whatever you like with it, including but
 ;;;> not limited to distributing, modifying, and copying.
@@ -118,7 +118,7 @@
     (t (error "Internal error:  Unknown structure type: ~S" type))
     ))
 
-  
+
 ;;;; To find out if a symbol is a *defstruct slot accessor
 ;;;; call the function *defstruct-slot-accessor-p.
 
@@ -215,8 +215,8 @@
 			 ((:PROPERTY)
 			  (let ((property-name (modify-name slot-or-property-name "*DEFSTRUCT-" "")))
 			    (push property-name properties)
-			    `(get (type-name type) ',property-name)
-			    ))))
+			    `(get (type-name type) ',property-name)))
+                         ))
 		    (defun ,(modify-name name "STRUCTURE-PVAR-" "") (pvar)
 		      (,(modify-name name "STRUCTURE-PVAR-TYPE-" "")
 		       (canonical-pvar-type-from-pvar pvar)
@@ -247,4 +247,3 @@
 	)
       (nth slot-position front-end-slots-list)
       )))
-

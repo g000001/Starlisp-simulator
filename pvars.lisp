@@ -61,12 +61,17 @@
 
 #+CMU
 (defun internal-pvarp (object)
-  (and (ext:structurep object)
+  (and #-(or pcl cmu20) (ext:structurep object)
+       #+(or pcl cmu20) (pcl::structurep object)
        (let ((obj-name (svref object 0)))
 	 (or (eq obj-name 'pvar)
-	     (not (null (memq 'pvar
-			      (dd-includes
- 			       (get obj-name '%structure-definition)))))))))
+	     (not 
+              (null
+               (#+(or pcl cmu20) ext:memq
+                #-(or pcl cmu20) memq
+                'pvar
+                (dd-includes
+                 (get obj-name '%structure-definition)))))))))
 
 #+CORMANLISP
 (defun internal-pvarp (x) 

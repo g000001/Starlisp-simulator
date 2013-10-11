@@ -98,7 +98,7 @@
 	     ',(mapcar #'(lambda (slot) (slot-accessor-function-name ds slot)) (*defstruct-all-slots-list ds)))
        (setf (get ',name '*defstruct-front-end-slot-accessors)
 	     ',(mapcar #'(lambda (slot) (front-end-accessor-name ds slot)) (*defstruct-all-slots-list ds)))
-       #-SBCL
+       #-(OR SBCL CCL CMU20)
        (PROGN
        ,@(mapcar #'(lambda (slot)
 		     `(*proclaim '(ftype (function (,name) ,(*defstruct-slot-type slot))

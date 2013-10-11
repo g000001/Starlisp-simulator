@@ -76,7 +76,8 @@
     (*deallocate-*defvar-if-possible variable)
     (when (and (*lisp-runnable-p) (vp-set-instantiated-p (symbol-value vp-set-name)))
       (if init-function
-	  (funcall (if (not (compiled-function-p (symbol-function init-function))) (compile init-function) init-function))
+	  #-(OR SBCL) (funcall (if (not (compiled-function-p (symbol-function init-function))) (compile init-function) init-function))
+	  #+(OR SBCL)(funcall init-function)
 	  (allocate-*defvar variable initial-value vp-set)))
     (if old-*defvar-specification-index
 	(setf (nth old-*defvar-specification-index *all-*defvar-specifications*) new-*defvar-specification)

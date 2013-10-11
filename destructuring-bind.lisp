@@ -3,7 +3,7 @@
 (in-package :*sim-i)
 
 ;;;> *+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+
-;;;> 
+;;;>
 ;;;> The Thinking Machines *Lisp Simulator is in the public domain.
 ;;;> You are free to do whatever you like with it, including but
 ;;;> not limited to distributing, modifying, and copying.
@@ -18,6 +18,12 @@
 
 
 (proclaim '(special destructuring-bind-error-tag))
+
+
+(defun parse-body-macroexpand-1 (form env)
+  (let ((*compiling* nil) (*compilep* nil))
+    (macroexpand-1 form env)
+    ))
 
 (defun parse-body (body &optional environment documentationp)
   (do ((body body (cdr body))
@@ -387,7 +393,7 @@
 						    (,*getf-function* ,form ,keyword))))))
 			     ,@bindings)
 			   extra)))))))
-				    
+
 (defun decompose-&allow-other-keys (lambda-list form environment keys-seen)
   (if (eq (car lambda-list) '&allow-other-keys)
       (if (cdr lambda-list)

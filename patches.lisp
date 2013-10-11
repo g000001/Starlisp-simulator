@@ -19,7 +19,7 @@
 (defun load-patches ()
 ;  (load "C:/Lispcode/Starsim/F20/patches.lisp")
 ;  (load "C:/Lispcode/Starsim/F20/patches.lisp")
-  (load "/u/mc/lisp/Lisp/StarLisp/sbcl/patches.lisp")
+;  (load "/u/mc/lisp/Lisp/StarLisp/sbcl/patches.lisp")
   )
 
 ;;; ===========================================================================
